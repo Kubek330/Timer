@@ -62,6 +62,33 @@
   }
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+  // własne okno zamiast prompt()/confirm(); input === null -> tylko potwierdzenie
+  function ask({ title, msg = '', input = null, ok = 'OK', danger = false }) {
+    return new Promise((resolve) => {
+      const m = $('#modalAsk');
+      const inp = $('#askInput');
+      $('#askTitle').textContent = title;
+      $('#askMsg').textContent = msg;
+      $('#askOk').textContent = ok;
+      $('#askOk').classList.toggle('danger-fill', danger);
+      inp.hidden = input === null;
+      inp.value = input || '';
+      $$('.modal').forEach((x) => { x.hidden = true; });
+      m.hidden = false;
+      setTimeout(() => { if (input !== null) { inp.focus(); inp.select(); } else $('#askOk').focus(); }, 30);
+      const done = (v) => {
+        m.hidden = true;
+        $('#askForm').onsubmit = null;
+        $('#askCancel').onclick = null;
+        m.onclick = null;
+        resolve(v);
+      };
+      $('#askForm').onsubmit = (e) => { e.preventDefault(); done(input === null ? true : (inp.value.trim() || null)); };
+      $('#askCancel').onclick = () => done(input === null ? false : null);
+      m.onclick = (e) => { if (e.target === m) done(input === null ? false : null); };
+    });
+  }
+
   /* ================= Scramble ================= */
   let scramble = '';
   function newScramble() {
@@ -502,22 +529,25 @@
         <button class="icon-btn" data-act="delete" title="Usuń" aria-label="Usuń"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13" stroke-linejoin="round"/></svg></button>
       </li>`).join('');
   }
-  $('#sessionList').addEventListener('click', (e) => {
+  $('#sessionList').addEventListener('click', async (e) => {
     const li = e.target.closest('li');
     if (!li) return;
     const s = data.sessions.find((x) => x.id === li.dataset.id);
     const act = e.target.closest('button') && e.target.closest('button').dataset.act;
     if (act === 'rename') {
-      const n = prompt('Nowa nazwa sesji:', s.name);
-      if (n && n.trim()) { s.name = n.trim().slice(0, 40); save(); renderSessions(); renderStats(); }
+      const n = await ask({ title: 'Zmień nazwę sesji', input: s.name, ok: 'Zapisz' });
+      if (n) { s.name = n.slice(0, 40); save(); renderStats(); }
+      openSessions();
       return;
     }
     if (act === 'delete') {
       if (data.sessions.length === 1) { toast('Musi zostać co najmniej jedna sesja'); return; }
-      if (!confirm(`Usunąć sesję „${s.name}” (${s.solves.length} czasów)?`)) return;
+      const yes = await ask({ title: 'Usunąć sesję?', msg: `Sesja „${s.name}” i jej czasy (${s.solves.length}) zostaną usunięte na zawsze.`, ok: 'Usuń', danger: true });
+      if (!yes) { openSessions(); return; }
       data.sessions = data.sessions.filter((x) => x.id !== s.id);
       if (data.current === s.id) switchSession(data.sessions[0].id);
-      save(); renderSessions();
+      save(); openSessions();
+      toast('Usunięto sesję');
       return;
     }
     switchSession(s.id);
@@ -533,10 +563,10 @@
     renderStats();
     renderSessions();
   }
-  $('#btnNewSession').addEventListener('click', () => {
-    const n = prompt('Nazwa nowej sesji:', 'Sesja ' + (data.sessions.length + 1));
-    if (!n || !n.trim()) return;
-    const s = newSession(n.trim().slice(0, 40), session().puzzle);
+  $('#btnNewSession').addEventListener('click', async () => {
+    const n = await ask({ title: 'Nowa sesja', input: 'Sesja ' + (data.sessions.length + 1), ok: 'Utwórz' });
+    if (!n) { openSessions(); return; }
+    const s = newSession(n.slice(0, 40), session().puzzle);
     data.sessions.push(s);
     switchSession(s.id);
     closeModals();
@@ -589,14 +619,14 @@
     ['forest', 'Las'], ['violet', 'Fiolet'], ['sunset', 'Zachód'],
   ];
   function applyTheme() {
-    document.documentElement.dataset.theme = S.theme;
+    document.documentElement.dataset.ccTheme = S.theme;
     const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-2').trim();
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta && bg) meta.content = bg;
   }
   function renderThemes() {
     const grid = $('#themeGrid');
-    grid.innerHTML = THEMES.map(([id, name]) => `<button class="theme-chip${S.theme === id ? ' on' : ''}" data-theme-id="${id}" data-theme="${id}" style="background:var(--surface);color:var(--text)"><span class="sw"><i style="background:var(--bg)"></i><i style="background:var(--digits)"></i><i style="background:var(--accent)"></i><i style="background:var(--ready)"></i></span>${name}</button>`).join('');
+    grid.innerHTML = THEMES.map(([id, name]) => `<button class="theme-chip${S.theme === id ? ' on' : ''}" data-theme-id="${id}" data-cc-theme="${id}" style="background:var(--surface);color:var(--text)"><span class="sw"><i style="background:var(--bg)"></i><i style="background:var(--digits)"></i><i style="background:var(--accent)"></i><i style="background:var(--ready)"></i></span>${name}</button>`).join('');
   }
   $('#themeGrid').addEventListener('click', (e) => {
     const b = e.target.closest('[data-theme-id]');

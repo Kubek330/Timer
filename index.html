@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pl" data-theme="dark">
+<html lang="pl" data-cc-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
@@ -204,6 +204,20 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="modal" id="modalAsk" hidden>
+    <form class="modal-box" id="askForm">
+      <div class="modal-head"><h2 id="askTitle"></h2></div>
+      <div class="modal-body">
+        <p class="ask-msg" id="askMsg"></p>
+        <input type="text" class="ask-input" id="askInput" maxlength="40" autocomplete="off">
+        <div class="btn-row">
+          <button type="button" class="btn ghost" id="askCancel">Anuluj</button>
+          <button type="submit" class="btn" id="askOk">OK</button>
+        </div>
+      </div>
+    </form>
   </div>
 
   <div class="toast" id="toast" hidden></div>
