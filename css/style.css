@@ -538,3 +538,17 @@ body.solving.focus .timer-hint { opacity: 0; pointer-events: none; }
 @media (max-height: 520px) and (min-width: 761px) {
   .stat-list .row { padding: 7px 0; }
 }
+
+/* przycisk pobrania aplikacji na Androida */
+.app-card {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 16px; padding: 12px 14px;
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--surface);
+  color: var(--text); text-decoration: none;
+}
+.app-card:hover { background: var(--surface-2); }
+.app-card svg { flex: none; color: var(--ready); }
+.app-card span { display: flex; flex-direction: column; gap: 2px; }
+.app-card small { color: var(--muted); font-size: 12px; }
+body.in-app .web-only { display: none !important; }

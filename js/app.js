@@ -747,6 +747,17 @@
     });
   })();
 
+  /* ================= Aplikacja na Androida ================= */
+  // w aplikacji ukrywamy elementy działające tylko w przeglądarce (pobieranie plików)
+  if (/CubeClockApp/.test(navigator.userAgent)) document.body.classList.add('in-app');
+  // wywoływane przez przycisk "wstecz" w aplikacji; true = obsłużone na stronie
+  window.ccBack = () => {
+    if (modalOpen()) { closeModals(); return true; }
+    if (tState !== 'idle') { cancelAll(); return true; }
+    if (MOBILE.matches && !S.sheetClosed) { S.sheetClosed = true; applyPanel(); save(); return true; }
+    return false;
+  };
+
   /* ================= Start ================= */
   applyTheme();
   applyPanel();

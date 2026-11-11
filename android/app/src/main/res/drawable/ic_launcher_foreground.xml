@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Izometryczna kostka 3x3, rysowana w siatce 24x24 i przeskalowana do bezpiecznej strefy ikony -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="2.4"
+        android:scaleY="2.4"
+        android:translateX="25.2"
+        android:translateY="25.2">
+        <path android:fillColor="#ECECEE" android:pathData="M12,2.5 L20.5,7 L12,11.5 L3.5,7 Z" />
+        <path android:fillColor="#A4A4AB" android:pathData="M3.5,7 L12,11.5 L12,21.5 L3.5,17 Z" />
+        <path android:fillColor="#6E6E76" android:pathData="M20.5,7 L12,11.5 L12,21.5 L20.5,17 Z" />
+        <path
+            android:strokeColor="#161618"
+            android:strokeWidth="0.55"
+            android:strokeLineJoin="round"
+            android:pathData="M6.33,8.5 L14.83,4 M9.17,10 L17.67,5.5 M6.33,5.5 L14.83,10 M9.17,4 L17.67,8.5 M6.33,8.5 L6.33,18.5 M9.17,10 L9.17,20 M14.83,10 L14.83,20 M17.67,8.5 L17.67,18.5 M3.5,10.33 L12,14.83 L20.5,10.33 M3.5,13.67 L12,18.17 L20.5,13.67 M3.5,7 L12,11.5 L20.5,7 M12,11.5 L12,21.5" />
+    </group>
+</vector>

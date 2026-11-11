@@ -1,0 +1,68 @@
+name: Android APK
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Kopiuj stronę do aplikacji
+        run: |
+          mkdir -p android/app/src/main/assets/www
+          cp -r index.html css js fonts android/app/src/main/assets/www/
+
+      # Stały klucz z sekretu ANDROID_KEYSTORE_BASE64 (+ ANDROID_KEYSTORE_PASSWORD) pozwala instalować
+      # nowe wersje na starych bez utraty czasów. Bez sekretu powstaje klucz tymczasowy.
+      - name: Przygotuj klucz podpisu
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          KS="$RUNNER_TEMP/release.keystore"
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$KS"
+            PASS="$KEYSTORE_PASS"
+          else
+            echo "::warning::Brak sekretu ANDROID_KEYSTORE_BASE64 - APK podpisany kluczem tymczasowym"
+            PASS="$(openssl rand -hex 16)"
+            keytool -genkeypair -keystore "$KS" -storepass "$PASS" -keypass "$PASS" \
+              -alias cubeclock -keyalg RSA -keysize 2048 -validity 20000 -dname "CN=CubeClock"
+          fi
+          echo "::add-mask::$PASS"
+          echo "CC_KEYSTORE=$KS" >> "$GITHUB_ENV"
+          echo "CC_KEYSTORE_PASSWORD=$PASS" >> "$GITHUB_ENV"
+
+      - name: Zbuduj APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon -PversionCode=${{ github.run_number }}
+          cp app/build/outputs/apk/release/app-release.apk ../CubeClock.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CubeClock-apk
+          path: CubeClock.apk
+
+      - name: Opublikuj wydanie
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v1.0.${{ github.run_number }}" CubeClock.apk \
+            --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
+            --title "CubeClock 1.0.${{ github.run_number }}" \
+            --notes "Plik CubeClock.apk do zainstalowania na Androidzie (8.0 lub nowszym)." \
+            --latest
