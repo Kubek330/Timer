@@ -146,7 +146,14 @@
             <option value="1000">1 s</option>
           </select>
         </label>
-        <label class="opt"><span>Pokazuj czas podczas ułożenia</span><input type="checkbox" id="setShowRunning"></label>
+        <label class="opt"><span>Czas podczas ułożenia</span>
+          <select id="setRunMode">
+            <option value="0.01">0,01 s</option>
+            <option value="0.1">0,1 s</option>
+            <option value="1">pełne sekundy</option>
+            <option value="none">ukryty</option>
+          </select>
+        </label>
         <label class="opt"><span>Ukrywaj resztę ekranu podczas ułożenia</span><input type="checkbox" id="setFocus"></label>
         <label class="opt"><span>Podgląd kostki</span><input type="checkbox" id="setDraw"></label>
         <div class="opt col">

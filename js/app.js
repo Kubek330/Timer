@@ -12,7 +12,7 @@
     inspection: false,
     inspSound: true,
     hold: 300,
-    showRunning: true,
+    runMode: '0.1', // dokładność czasu w trakcie ułożenia: 0.01 | 0.1 | 1 | none
     focus: true,
     draw: true,
     theme: 'dark',
@@ -30,7 +30,10 @@
       const s = newSession('Sesja 1', '333');
       d = { sessions: [s], current: s.id, settings: {} };
     }
-    d.settings = Object.assign({}, DEFAULT_SETTINGS, d.settings || {});
+    const raw = d.settings || {};
+    if (raw.runMode === undefined && raw.showRunning === false) raw.runMode = 'none';
+    delete raw.showRunning;
+    d.settings = Object.assign({}, DEFAULT_SETTINGS, raw);
     if (!d.sessions.find((s) => s.id === d.current)) d.current = d.sessions[0].id;
     return d;
   }
@@ -207,6 +210,15 @@
     if (S.hold <= 0) ready(); else holdTimer = setTimeout(ready, S.hold);
   }
 
+  // czas wyświetlany w trakcie ułożenia (ucięty do wybranej dokładności)
+  let lastRunTxt = '';
+  function fmtRun(ms) {
+    const full = fmt(ms);
+    if (S.runMode === '0.1') return full.slice(0, -1);
+    if (S.runMode === '1') return full.slice(0, -3);
+    return full;
+  }
+
   function startRun() {
     cancelAnimationFrame(raf);
     startT = performance.now();
@@ -216,10 +228,14 @@
     $('#lastActions').hidden = true;
     const tick = () => {
       if (tState !== 'running') return;
-      if (S.showRunning) setDigits(fmt(performance.now() - startT));
+      if (S.runMode !== 'none') {
+        const txt = fmtRun(performance.now() - startT);
+        if (txt !== lastRunTxt) { lastRunTxt = txt; setDigits(txt); }
+      }
       raf = requestAnimationFrame(tick);
     };
-    if (!S.showRunning) setDigits('ułóż', true);
+    lastRunTxt = '';
+    if (S.runMode === 'none') setDigits('ułóż', true);
     raf = requestAnimationFrame(tick);
   }
 
@@ -646,7 +662,8 @@
   };
   bindCheck('#setInspection', 'inspection', () => { cancelAll(); });
   bindCheck('#setInspSound', 'inspSound');
-  bindCheck('#setShowRunning', 'showRunning');
+  $('#setRunMode').value = S.runMode;
+  $('#setRunMode').addEventListener('change', (e) => { S.runMode = e.target.value; save(); e.target.blur(); });
   bindCheck('#setFocus', 'focus', () => document.body.classList.toggle('focus', S.focus));
   bindCheck('#setDraw', 'draw', renderScramble);
   $('#setHold').value = String(S.hold);

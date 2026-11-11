@@ -4,6 +4,7 @@ Timer do kostki Rubika działający w przeglądarce, na komputerze i na telefoni
 
 ## Funkcje
 - Start i stop spacją (komputer) albo przytrzymaniem ekranu (telefon)
+- Wybór dokładności czasu w trakcie ułożenia: 0,01 s, 0,1 s, pełne sekundy albo ukryty (wynik zawsze z dokładnością do 0,01 s)
 - Inspekcja 15 s (WCA) z sygnałem po 8 i 12 s, automatyczne +2 i DNF
 - Scramble: 2x2–7x7, 3x3 OH, Pyraminx, Skewb, Megaminx, Square-1, Clock
 - Podgląd ułożenia kostki po scramble'u (2x2–7x7)
