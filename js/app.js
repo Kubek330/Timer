@@ -109,6 +109,9 @@
     const draw = $('#cubeDraw');
     const card = draw.closest('.scramble-card');
     card.hidden = !S.draw;
+    const has3d = Scramble.cubeSize(session().puzzle) > 0;
+    $('#btn3d').hidden = !has3d;
+    $('#btn3dCard').hidden = !has3d;
     if (S.draw) {
       const svg = Scramble.draw(session().puzzle, scramble);
       draw.innerHTML = svg || 'Podgląd jest dostępny dla kostek 2x2–7x7.';
@@ -312,6 +315,7 @@
   const modalOpen = () => $$('.modal').some((m) => !m.hidden);
 
   document.addEventListener('keydown', (e) => {
+    if (Cube3D.isOpen()) { if (Cube3D.key(e)) e.preventDefault(); return; }
     if (modalOpen()) { if (e.key === 'Escape') closeModals(); return; }
     if (e.target.closest('input, select, textarea')) return;
     if (tState === 'running') {
@@ -682,6 +686,10 @@
     sel.blur();
   });
   $('#btnNewScramble').addEventListener('click', (e) => { newScramble(); e.currentTarget.blur(); });
+  const open3d = (e) => { if (e) e.currentTarget.blur(); Cube3D.open(session().puzzle, scramble); };
+  Cube3D.init();
+  $('#btn3d').addEventListener('click', open3d);
+  $('#btn3dCard').addEventListener('click', open3d);
   $('#btnCopy').addEventListener('click', () => copy(scramble.replace(/\n/g, ' ')));
   $('#btnFullscreen').addEventListener('click', () => {
     if (document.fullscreenElement) document.exitFullscreen();
@@ -752,6 +760,7 @@
   if (/CubeClockApp/.test(navigator.userAgent)) document.body.classList.add('in-app');
   // wywoływane przez przycisk "wstecz" w aplikacji; true = obsłużone na stronie
   window.ccBack = () => {
+    if (Cube3D.isOpen()) { Cube3D.close(); return true; }
     if (modalOpen()) { closeModals(); return true; }
     if (tState !== 'idle') { cancelAll(); return true; }
     if (MOBILE.matches && !S.sheetClosed) { S.sheetClosed = true; applyPanel(); save(); return true; }

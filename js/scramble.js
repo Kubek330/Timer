@@ -171,19 +171,29 @@
     else { p.x = y; p.y = -x; }
   }
 
-  function applyMove(st, n, mv) {
+  // rozkłada ruch (np. "3Rw'") na: oś, stronę, szerokość i liczbę obrotów CW wokół dodatniej osi
+  function parseMove(mv) {
     const m = /^(\d*)([URFDLB])(w?)(['2]?)$/.exec(mv);
-    if (!m) return;
+    if (!m) return null;
     const face = FACE_DEF[m[2]];
     const width = m[3] ? (m[1] ? parseInt(m[1], 10) : 2) : 1;
     // obrót CW ściany o znaku -1 to obrót CCW wokół dodatniej osi
     let turns = m[4] === '2' ? 2 : (m[4] === "'" ? 3 : 1);
     if (face.sign < 0) turns = (4 - turns) % 4;
-    const limit = n - 2 * width;
+    return { face: m[2], axis: face.axis, sign: face.sign, width, turns, suffix: m[4] };
+  }
+
+  const inLayer = (p, mv, n) => p[mv.axis] * mv.sign > n - 2 * mv.width;
+
+  function applyParsed(st, n, mv) {
     for (const p of st) {
-      const v = p[face.axis] * face.sign;
-      if (v > limit) for (let t = 0; t < turns; t++) rotCW(p, face.axis);
+      if (inLayer(p, mv, n)) for (let t = 0; t < mv.turns; t++) rotCW(p, mv.axis);
     }
+  }
+
+  function applyMove(st, n, mv) {
+    const m = parseMove(mv);
+    if (m) applyParsed(st, n, m);
   }
 
   // pozycja naklejki w siatce danej ściany (kolumna, wiersz)
@@ -233,5 +243,12 @@
       const n = CUBE_SIZE[puzzle];
       return n ? cubeSVG(n, scramble) : null;
     },
+    // do podglądu 3D
+    cubeSize: (puzzle) => CUBE_SIZE[puzzle] || 0,
+    solvedCube,
+    parseMove,
+    applyParsed,
+    inLayer,
+    COLORS,
   };
 })();

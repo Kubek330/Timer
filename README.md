@@ -8,6 +8,7 @@ Timer do kostki Rubika działający w przeglądarce, na komputerze i na telefoni
 - Inspekcja 15 s (WCA) z sygnałem po 8 i 12 s, automatyczne +2 i DNF
 - Scramble: 2x2–7x7, 3x3 OH, Pyraminx, Skewb, Megaminx, Square-1, Clock
 - Podgląd ułożenia kostki po scramble'u (2x2–7x7)
+- Kostka 3D „Jak pomieszać”: animacja scramble'a ruch po ruchu z opisem każdego ruchu (2x2–7x7)
 - Statystyki: najlepszy czas, średnia, mo3, ao5, ao12, ao50, ao100, ao1000 i wykres
 - Kary +2 i DNF, usuwanie czasów, szczegóły każdego ułożenia
 - Sesje: tworzenie, zmiana nazwy, usuwanie, eksport i import do pliku JSON

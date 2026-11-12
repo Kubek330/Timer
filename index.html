@@ -91,6 +91,7 @@
               </button>
             </div>
             <div class="cube-draw" id="cubeDraw"></div>
+            <button class="btn ghost show3d" id="btn3dCard">Pokaż w 3D, jak pomieszać</button>
           </div>
         </section>
 
@@ -113,6 +114,9 @@
       <div class="scramble-bar">
         <select id="puzzleSelect" aria-label="Rodzaj kostki"></select>
         <div class="scramble-text" id="scrambleText">…</div>
+        <button class="icon-btn small" id="btn3d" title="Jak pomieszać – kostka 3D" aria-label="Jak pomieszać – kostka 3D">
+          <svg viewBox="0 0 24 24"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z M3.5 7 12 11.5 20.5 7M12 11.5v10" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </button>
         <button class="icon-btn small" id="btnNewScramble" title="Nowy scramble" aria-label="Nowy scramble">
           <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -217,6 +221,49 @@
     </div>
   </div>
 
+  <div class="modal" id="modal3d" hidden>
+    <div class="modal-box wide c3d-box">
+      <div class="modal-head"><h2>Jak pomieszać</h2><button class="icon-btn small" data-close3d aria-label="Zamknij">✕</button></div>
+      <div class="modal-body">
+        <p class="muted small c3d-hold">Trzymaj kostkę <b>białym do góry</b> i <b>zielonym do siebie</b>. Kostkę na ekranie możesz obracać palcem.</p>
+        <div class="c3d-stage" id="c3dStage">
+          <div class="c3d-cube" id="c3dCube"></div>
+        </div>
+        <div class="c3d-info">
+          <div id="c3dStep"></div>
+          <div class="c3d-desc" id="c3dDesc"></div>
+        </div>
+        <div class="c3d-moves" id="c3dMoves"></div>
+        <div class="c3d-controls">
+          <button class="btn ghost" id="c3dReset" title="Od początku" aria-label="Od początku">⏮</button>
+          <button class="btn ghost" id="c3dPrev">◀ Wstecz</button>
+          <button class="btn" id="c3dNext">Dalej ▶</button>
+        </div>
+        <div class="c3d-controls">
+          <button class="btn ghost" id="c3dPlay">Odtwórz</button>
+          <label class="c3d-speed">Tempo
+            <select id="c3dSpeed">
+              <option value="900">wolno</option>
+              <option value="500" selected>normalnie</option>
+              <option value="250">szybko</option>
+            </select>
+          </label>
+          <button class="btn ghost" id="c3dView">Wyprostuj</button>
+        </div>
+        <details class="c3d-help">
+          <summary>Co znaczą litery?</summary>
+          <ul>
+            <li><b>R</b> prawa, <b>L</b> lewa, <b>U</b> górna, <b>D</b> dolna, <b>F</b> przednia, <b>B</b> tylna ściana.</li>
+            <li>Sama litera: obrót o 90° zgodnie z ruchem wskazówek zegara, patrząc prosto na tę ścianę.</li>
+            <li><b>'</b> (np. R'): obrót w przeciwną stronę.</li>
+            <li><b>2</b> (np. R2): obrót o 180°, czyli dwa razy.</li>
+            <li><b>w</b> (np. Rw): obracasz dwie zewnętrzne warstwy naraz; <b>3Rw</b> to trzy warstwy.</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </div>
+
   <div class="modal" id="modalAsk" hidden>
     <form class="modal-box" id="askForm">
       <div class="modal-head"><h2 id="askTitle"></h2></div>
@@ -235,6 +282,7 @@
 
   <script src="js/scramble.js"></script>
   <script src="js/stats.js"></script>
+  <script src="js/cube3d.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
