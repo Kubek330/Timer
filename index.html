@@ -23,6 +23,10 @@
       <span class="brand-name">CubeClock</span>
     </div>
     <nav class="top-actions">
+      <button class="streak-chip" id="streakChip" title="Passa" aria-label="Passa">
+        <svg viewBox="0 0 120 150" aria-hidden="true"><path class="fl-outer" d="M60 146c-30 0-50-20-50-48 0-27 18-42 28-60 3 14 10 22 19 26-2-24 7-44 25-58 2 22 13 34 23 47 7 10 11 22 11 35 0 33-23 58-56 58z"/><path class="fl-core" d="M60 146c-14 0-24-10-24-24 0-12 8-20 13-28 2 8 6 11 11 13 0-11 4-20 12-27 2 11 7 17 11 23 3 5 4 10 4 16 0 16-12 27-27 27z"/></svg>
+        <b>0</b>
+      </button>
       <button class="icon-btn" id="btnSettings" title="Ustawienia" aria-label="Ustawienia">
         <svg viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Zm7.4-2.5a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1l-.4-2.7h-4l-.4 2.7a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L4.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5Z"/></svg>
       </button>
@@ -164,9 +168,11 @@
         <label class="opt"><span>Ukrywaj resztę ekranu podczas ułożenia</span><input type="checkbox" id="setFocus"></label>
         <label class="opt"><span>Podgląd kostki</span><input type="checkbox" id="setDraw"></label>
         <label class="opt"><span>Animacja nowego rekordu</span><input type="checkbox" id="setCelebrate"></label>
+        <label class="opt"><span>Animacja passy (pierwsze ułożenie dnia)</span><input type="checkbox" id="setStreakAnim"></label>
         <div class="opt col remind">
           <label class="opt-in"><span>Codzienne przypomnienie o treningu</span><input type="checkbox" id="setReminder"></label>
           <label class="opt-in"><span>Godzina</span><input type="time" id="setReminderTime" value="18:00"></label>
+          <label class="opt-in"><span>Ostatnia szansa o 21:30, gdy passa może przepaść</span><input type="checkbox" id="setLastCall"></label>
           <p class="muted small" id="reminderNote"></p>
         </div>
         <div class="opt col">
@@ -312,6 +318,18 @@
     </form>
   </div>
 
+  <div class="streak-ov" id="streakOv" hidden role="dialog" aria-modal="true" aria-label="Passa">
+    <div class="so-inner">
+      <div class="so-flame"><canvas class="so-sparks"></canvas></div>
+      <div class="so-num"></div>
+      <div class="so-label"></div>
+      <p class="so-msg"></p>
+      <div class="so-week"></div>
+      <p class="so-best"></p>
+      <button class="btn so-btn">Dalej</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast" hidden></div>
 
   <script src="js/scramble.js"></script>
@@ -319,6 +337,7 @@
   <script src="js/cube3d.js"></script>
   <script src="js/icons.js"></script>
   <script src="js/progress.js"></script>
+  <script src="js/streak.js"></script>
   <script src="js/insights.js"></script>
   <script src="js/app.js"></script>
 </body>

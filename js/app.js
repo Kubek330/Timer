@@ -11,6 +11,8 @@
   const DEFAULT_SETTINGS = {
     inspection: false,
     celebrate: true,
+    streakAnim: true,
+    lastCall: true,
     reminder: false,
     reminderTime: '18:00',
     inspSound: true,
@@ -255,6 +257,8 @@
     cancelAnimationFrame(raf);
     clearTimeout(holdTimer);
     const s = session();
+    const before = Progress.compute(data);
+    const firstToday = !before.perDay[Progress.dayKey(Date.now())];
     const solve = { id: uid(), time, penalty: pen || 0, scramble, date: Date.now(), puzzle: s.puzzle };
     if (S.inspection) solve.insp = true;
     s.solves.push(solve);
@@ -269,8 +273,24 @@
     save();
     newScramble();
     renderStats();
-    if (S.celebrate) Progress.celebrate(recs, fmt);
-    Progress.announce(fresh);
+    const after = Progress.compute(data);
+    Streak.updateChip(after);
+    const extras = () => {
+      if (S.celebrate) Progress.celebrate(recs, fmt);
+      Progress.announce(fresh);
+    };
+    if (firstToday && S.streakAnim) {
+      // passa: jeśli wczoraj nie było ułożenia, poprzednia passa przepadła
+      const lost = after.streak === 1 ? Progress.lastStreak(before.perDay, Progress.dayKey(Date.now())) : 0;
+      Streak.show({
+        streak: after.streak,
+        from: Math.max(0, after.streak - 1),
+        perDay: after.perDay,
+        best: after.maxStreak,
+        prevBest: before.maxStreak,
+        lost,
+      }).then(extras);
+    } else extras();
     syncNative();
   }
 
@@ -324,6 +344,10 @@
   const modalOpen = () => $$('.modal').some((m) => !m.hidden);
 
   document.addEventListener('keydown', (e) => {
+    if (Streak.isOpen()) {
+      if (['Space', 'Enter', 'Escape', 'NumpadEnter'].includes(e.code) || e.key === 'Escape') { e.preventDefault(); if (!e.repeat) { Streak.close(); ignoreRelease = e.code === 'Space'; } }
+      return;
+    }
     if (Cube3D.isOpen()) { if (Cube3D.key(e)) e.preventDefault(); return; }
     if (modalOpen()) { if (e.key === 'Escape') closeModals(); return; }
     if (e.target.closest('input, select, textarea')) return;
@@ -392,6 +416,7 @@
     Progress.announce(Progress.check(data));
     save();
     renderStats();
+    Streak.updateChip(Progress.compute(data));
     syncNative();
   }
 
@@ -727,6 +752,7 @@
   bindCheck('#setFocus', 'focus', () => document.body.classList.toggle('focus', S.focus));
   bindCheck('#setDraw', 'draw', renderScramble);
   bindCheck('#setCelebrate', 'celebrate');
+  bindCheck('#setStreakAnim', 'streakAnim');
   $('#setHold').value = String(S.hold);
   $('#setHold').addEventListener('change', (e) => { S.hold = Number(e.target.value); save(); });
   $('#btnSettings').addEventListener('click', () => { renderThemes(); openModal('#modalSettings'); });
@@ -817,6 +843,7 @@
   if (/CubeClockApp/.test(navigator.userAgent)) document.body.classList.add('in-app');
   // wywoływane przez przycisk "wstecz" w aplikacji; true = obsłużone na stronie
   window.ccBack = () => {
+    if (Streak.isOpen()) { Streak.close(); return true; }
     if (Cube3D.isOpen()) { Cube3D.close(); return true; }
     if (modalOpen()) { closeModals(); return true; }
     if (tState !== 'idle') { cancelAll(); return true; }
@@ -839,19 +866,24 @@
     if (!native) return;
     const [h, m] = (S.reminderTime || '18:00').split(':').map(Number);
     try { native.setReminder(!!S.reminder, h, m); } catch (e) { /* stara wersja aplikacji */ }
+    try { native.setLastCall(!!S.lastCall); } catch (e) { /* stara wersja aplikacji */ }
   }
   (function reminderUI() {
     const box = $('#setReminder');
     const time = $('#setReminderTime');
+    const last = $('#setLastCall');
+    last.checked = !!S.lastCall && !!native;
     box.checked = !!S.reminder && !!native;
     time.value = S.reminderTime;
     if (!native) {
       box.disabled = true;
       time.disabled = true;
+      last.disabled = true;
       $('#reminderNote').textContent = 'Przypomnienia działają w aplikacji CubeClock na Androida.';
       return;
     }
-    $('#reminderNote').textContent = 'Przychodzi tylko w dni, w które jeszcze nie układałeś. Przypomina też o serii dni.';
+    $('#reminderNote').textContent = 'Przychodzi tylko w dni, w które jeszcze nie układałeś, i pilnuje Twojej passy.';
+    last.addEventListener('change', () => { S.lastCall = last.checked; save(); applyReminder(); });
     window.ccNotifResult = (granted) => {
       if (!granted) {
         S.reminder = false;
@@ -888,6 +920,16 @@
   renderStats();
   syncNative();
   applyReminder();
+  Streak.init();
+  Streak.updateChip(Progress.compute(data));
+  // licznik passy: podgląd tygodnia
+  $('#streakChip').addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    const c = Progress.compute(data);
+    Streak.show({ streak: c.streak, from: c.streak, perDay: c.perDay, best: c.maxStreak, view: true });
+  });
+  // o północy licznik powinien zgasnąć, jeśli dziś jeszcze nic nie ułożono
+  setInterval(() => Streak.updateChip(Progress.compute(data)), 60000);
   setState('idle');
   setDigits('0.00');
   MOBILE.addEventListener && MOBILE.addEventListener('change', setHint);

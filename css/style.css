@@ -735,3 +735,104 @@ body.in-app .web-only { display: none !important; }
 .ic-inline.flame { color: #ff8a3d; }
 .rec-title .ic-inline { color: var(--ready); margin-right: 4px; }
 #c3dReset svg { width: 18px; height: 18px; }
+
+/* ===== Passa ===== */
+:root { --fl-1: #ff8a3d; --fl-2: #ffb43d; --fl-3: #ffe9a8; }
+.streak-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 44px; padding: 0 12px 0 8px;
+  border: 0; border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-weight: 800; font-size: 17px; font-variant-numeric: tabular-nums;
+}
+.streak-chip svg { width: 22px; height: 26px; }
+.streak-chip .fl-outer { fill: currentColor; opacity: .55; }
+.streak-chip .fl-core { fill: currentColor; opacity: .8; }
+.streak-chip.lit { color: var(--fl-1); }
+.streak-chip.lit .fl-outer { fill: var(--fl-1); opacity: 1; }
+.streak-chip.lit .fl-core { fill: var(--fl-2); opacity: 1; }
+.streak-chip:hover { background: var(--surface-3); }
+
+.streak-ov {
+  position: fixed; inset: 0; z-index: 80;
+  display: grid; place-items: center;
+  padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.streak-ov.play { animation: so-fade .25s ease-out; }
+.streak-ov.closing { animation: so-out .22s ease-in forwards; }
+@keyframes so-fade { from { opacity: 0; } }
+@keyframes so-out { to { opacity: 0; } }
+.so-inner { width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+
+.so-flame { position: relative; width: 150px; height: 180px; }
+.so-flame .flame-svg { position: absolute; left: 15px; top: 20px; width: 120px; height: 150px; overflow: visible; }
+.so-sparks { position: absolute; inset: -40px -60px 0; width: calc(100% + 120px); height: calc(100% + 40px); pointer-events: none; }
+.fl-outer { fill: var(--fl-1); }
+.fl-mid { fill: var(--fl-2); }
+.fl-core { fill: var(--fl-3); }
+.so-flame .fl-outer, .so-flame .fl-mid, .so-flame .fl-core { transform-box: fill-box; transform-origin: 50% 100%; }
+.streak-ov.play .flame-svg { animation: fl-grow .7s cubic-bezier(.2, 1.6, .4, 1) both; transform-origin: 50% 100%; }
+.streak-ov.play .fl-outer { animation: fl-flick 1.6s ease-in-out .7s infinite; }
+.streak-ov.play .fl-mid { animation: fl-flick 1.2s ease-in-out .75s infinite reverse; }
+.streak-ov.play .fl-core { animation: fl-flick .9s ease-in-out .8s infinite; }
+.streak-ov.view .flame-svg { animation-duration: .35s; }
+@keyframes fl-grow { 0% { transform: scale(0); opacity: 0; } 60% { opacity: 1; } 100% { transform: scale(1); } }
+@keyframes fl-flick { 0%, 100% { transform: scale(1, 1) skewX(0); } 30% { transform: scale(.96, 1.05) skewX(2deg); } 65% { transform: scale(1.03, .97) skewX(-2deg); } }
+.so-flame.cold .fl-outer { fill: var(--surface-3); }
+.so-flame.cold .fl-mid { fill: color-mix(in srgb, var(--muted) 60%, var(--surface-3)); }
+.so-flame.cold .fl-core { fill: var(--muted); }
+
+.so-num {
+  position: relative; height: 96px; width: 100%;
+  font-size: 88px; font-weight: 900; line-height: 96px;
+  color: var(--fl-1); font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+.so-num span { position: absolute; left: 0; right: 0; }
+.streak-ov.play .so-num .old { animation: num-out .45s ease-in .75s forwards; }
+.streak-ov.play .so-num .new { transform: translateY(100%); opacity: 0; animation: num-in .55s cubic-bezier(.2, 1.5, .4, 1) 1.05s forwards; }
+.streak-ov.play .so-num .still { animation: so-fade .3s ease-out; }
+.so-flame.cold + .so-num { color: var(--text-2); }
+@keyframes num-out { to { transform: translateY(-100%); opacity: 0; } }
+@keyframes num-in { to { transform: translateY(0); opacity: 1; } }
+.so-label { font-size: 22px; font-weight: 800; letter-spacing: .3px; margin-top: -2px; }
+.so-msg { color: var(--text-2); font-size: 15px; line-height: 1.5; margin: 10px 0 18px; max-width: 32ch; min-height: 3em; }
+.streak-ov.play:not(.view) .so-label, .streak-ov.play:not(.view) .so-msg { animation: so-up .5s ease-out 1.2s both; }
+@keyframes so-up { from { opacity: 0; transform: translateY(10px); } }
+
+.so-week {
+  display: flex; gap: 8px; justify-content: center;
+  padding: 14px 16px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--border);
+}
+.sw-day { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.sw-day i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); border: 2px solid var(--surface-3); }
+.sw-day i svg { width: 16px; height: 16px; stroke: #1a0d02; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.sw-day.done i { background: var(--fl-1); border-color: var(--fl-1); }
+.sw-day.done i svg { opacity: 1; }
+.sw-day.today span { color: var(--text); font-weight: 700; }
+.sw-day.today:not(.done) i { border-style: dashed; border-color: var(--fl-1); }
+.sw-day.future i { opacity: .45; }
+.streak-ov.play .sw-day.pop i { animation: day-pop .5s cubic-bezier(.2, 1.8, .4, 1) 1.5s both; }
+.streak-ov.play .sw-day.pop i svg { animation: so-fade .2s ease-out 1.75s both; }
+@keyframes day-pop { 0% { transform: scale(.4); background: var(--surface-2); border-color: var(--surface-3); } 100% { transform: scale(1); } }
+.so-best { color: var(--muted); font-size: 13px; margin: 12px 0 18px; }
+.so-btn { width: 100%; max-width: 320px; height: 50px; font-size: 16px; border-radius: 14px; background: var(--fl-1); color: #1a0d02; }
+.so-btn:focus-visible { outline: 3px solid var(--fl-3); outline-offset: 2px; }
+
+@media (max-width: 760px) {
+  .streak-chip { height: 38px; padding: 0 9px 0 6px; font-size: 15px; }
+  .streak-chip svg { width: 18px; height: 22px; }
+}
+@media (max-width: 430px) {
+  .brand-name { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .streak-ov *, .streak-ov { animation: none !important; }
+  .streak-ov .so-num .new { transform: none; opacity: 1; }
+  .streak-ov .so-num .old { display: none; }
+}

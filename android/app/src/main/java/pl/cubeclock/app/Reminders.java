@@ -34,24 +34,23 @@ public class Reminders extends BroadcastReceiver {
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.getTime());
     }
 
-    private static PendingIntent alarmIntent(Context c) {
-        Intent i = new Intent(c, Reminders.class);
-        return PendingIntent.getBroadcast(c, REQ, i,
+    // dwa przypomnienia: o wybranej godzinie i "ostatnia szansa" wieczorem
+    static final String KIND_DAILY = "daily";
+    static final String KIND_LAST = "last";
+    private static final int LAST_HOUR = 21;
+    private static final int LAST_MINUTE = 30;
+
+    private static PendingIntent alarmIntent(Context c, String kind) {
+        Intent i = new Intent(c, Reminders.class).setAction("pl.cubeclock.app.REMIND_" + kind);
+        i.putExtra("kind", kind);
+        return PendingIntent.getBroadcast(c, KIND_LAST.equals(kind) ? REQ + 1 : REQ, i,
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    /** Ustawia (albo kasuje) najbliższe przypomnienie zgodnie z zapisanymi ustawieniami. */
-    static void schedule(Context c) {
-        AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
-        if (am == null) return;
-        PendingIntent pi = alarmIntent(c);
-        am.cancel(pi);
-        SharedPreferences p = prefs(c);
-        if (!p.getBoolean("enabled", false)) return;
-
+    private static void setAt(AlarmManager am, PendingIntent pi, int hour, int minute) {
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, p.getInt("hour", 18));
-        cal.set(Calendar.MINUTE, p.getInt("minute", 0));
+        cal.set(Calendar.HOUR_OF_DAY, hour);
+        cal.set(Calendar.MINUTE, minute);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         if (cal.getTimeInMillis() <= System.currentTimeMillis() + 1000) cal.add(Calendar.DAY_OF_YEAR, 1);
@@ -59,12 +58,39 @@ public class Reminders extends BroadcastReceiver {
         am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pi);
     }
 
+    /** Ustawia (albo kasuje) przypomnienia zgodnie z zapisanymi ustawieniami. */
+    static void schedule(Context c) {
+        AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+        if (am == null) return;
+        PendingIntent daily = alarmIntent(c, KIND_DAILY);
+        PendingIntent last = alarmIntent(c, KIND_LAST);
+        am.cancel(daily);
+        am.cancel(last);
+        SharedPreferences p = prefs(c);
+        if (!p.getBoolean("enabled", false)) return;
+
+        int h = p.getInt("hour", 18);
+        int m = p.getInt("minute", 0);
+        setAt(am, daily, h, m);
+        // wieczorne przypomnienie ma sens tylko, gdy główne jest wcześniej
+        boolean earlier = h * 60 + m < LAST_HOUR * 60 + LAST_MINUTE - 60;
+        if (p.getBoolean("lastCall", true) && earlier) setAt(am, last, LAST_HOUR, LAST_MINUTE);
+    }
+
+    private static String days(int n) {
+        return n == 1 ? "1 dzień" : n + " dni";
+    }
+
+    private static String pick(String[] options, int seed) {
+        return options[Math.abs(seed) % options.length];
+    }
+
     static void ensureChannel(Context c) {
         NotificationManager nm = c.getSystemService(NotificationManager.class);
         if (nm == null || nm.getNotificationChannel(CHANNEL) != null) return;
         NotificationChannel ch = new NotificationChannel(CHANNEL, "Przypomnienia o treningu",
                 NotificationManager.IMPORTANCE_DEFAULT);
-        ch.setDescription("Codzienne przypomnienie, żeby ułożyć kostkę i nie przerwać serii.");
+        ch.setDescription("Codzienne przypomnienie, żeby ułożyć kostkę i nie przerwać passy.");
         nm.createNotificationChannel(ch);
     }
 
@@ -95,14 +121,40 @@ public class Reminders extends BroadcastReceiver {
         int streak = p.getInt("streak", 0);
         boolean streakAlive = streak > 0 && dayKey(y).equals(last);
 
+        String kind = intent.getStringExtra("kind");
+        boolean lastCall = KIND_LAST.equals(kind);
+        // wieczorem przypominamy tylko o passie, która może przepaść
+        if (lastCall && !streakAlive) return;
+
+        int seed = today.get(Calendar.DAY_OF_YEAR);
         String title;
         String text;
-        if (streakAlive) {
-            title = "Nie przerwij serii!";
-            text = "Masz " + streak + (streak == 1 ? " dzień" : " dni") + " z rzędu. Ułóż dziś kostkę chociaż raz.";
+        if (lastCall) {
+            title = "Ostatnia szansa!";
+            text = pick(new String[]{
+                    "Twoja passa (" + days(streak) + ") przepadnie o północy. Ułóż kostkę teraz.",
+                    "Jeszcze zdążysz! Jedno ułożenie ratuje passę " + days(streak) + ".",
+                    "Płomień zaraz zgaśnie. " + days(streak) + " z rzędu czeka na dzisiejsze ułożenie.",
+            }, seed);
+        } else if (streakAlive) {
+            String[][] opts = {
+                    {"Nie przerwij passy!", "Masz " + days(streak) + " z rzędu. Jedno ułożenie wystarczy."},
+                    {"Passa: " + days(streak), "Kostka czeka. Ułóż ją dziś chociaż raz."},
+                    {days(streak) + " z rzędu!", "Nie pozwól, żeby płomień zgasł. Wpadnij na jedno ułożenie."},
+                    {"Dzień " + (streak + 1) + " czeka", "Ułóż dziś kostkę i przedłuż passę."},
+            };
+            String[] o = opts[Math.abs(seed) % opts.length];
+            title = o[0];
+            text = o[1];
         } else {
-            title = "Czas na kostkę";
-            text = "Ułóż dziś chociaż raz i zacznij nową serię.";
+            String[][] opts = {
+                    {"Czas na kostkę", "Ułóż dziś chociaż raz i zacznij nową passę."},
+                    {"Kostka się nudzi", "Jedno ułożenie dziennie robi różnicę."},
+                    {"Krótki trening?", "Kilka ułożeń i masz pierwszy dzień passy."},
+            };
+            String[] o = opts[Math.abs(seed) % opts.length];
+            title = o[0];
+            text = o[1];
         }
 
         ensureChannel(c);

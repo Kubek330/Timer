@@ -65,6 +65,15 @@
     while (perDay[k]) { n++; k = addDays(k, -1); }
     return n;
   }
+  // długość passy kończącej się na ostatnim dniu z ułożeniem przed danym dniem
+  function lastStreak(perDay, beforeKey) {
+    const days = Object.keys(perDay).filter((k) => k < beforeKey).sort();
+    if (!days.length) return 0;
+    let k = days[days.length - 1];
+    let n = 0;
+    while (perDay[k]) { n++; k = addDays(k, -1); }
+    return n;
+  }
   function maxStreak(perDay) {
     const days = Object.keys(perDay).sort();
     let best = 0, run = 0, prev = null;
@@ -97,9 +106,9 @@
     { id: 'sub5_222', ic: ['cube2', ''], cat: 'speed', name: 'Mały, ale szybki', desc: 'Ułóż 2x2 w mniej niż 5 s.', test: (c) => sub(c.single222, 5) },
     { id: 'clean12', ic: ['sparkle', ''], cat: 'speed', name: 'Czysta dwunastka', desc: '12 ułożeń z rzędu bez +2 i DNF.', test: (c) => cnt(c.cleanRun, 12) },
     // serie dni
-    { id: 'streak3', ic: ['flame', '3'], cat: 'streak', name: 'Seria 3 dni', desc: 'Układaj 3 dni z rzędu.', test: (c) => cnt(c.maxStreak, 3) },
-    { id: 'streak7', ic: ['flame', '7'], cat: 'streak', name: 'Tydzień z kostką', desc: 'Układaj 7 dni z rzędu.', test: (c) => cnt(c.maxStreak, 7) },
-    { id: 'streak30', ic: ['cal', '30'], cat: 'streak', name: 'Miesiąc bez przerwy', desc: 'Układaj 30 dni z rzędu.', test: (c) => cnt(c.maxStreak, 30) },
+    { id: 'streak3', ic: ['flame', '3'], cat: 'streak', name: 'Passa 3 dni', desc: 'Układaj 3 dni z rzędu.', test: (c) => cnt(c.maxStreak, 3) },
+    { id: 'streak7', ic: ['flame', '7'], cat: 'streak', name: 'Tygodniowa passa', desc: 'Układaj 7 dni z rzędu.', test: (c) => cnt(c.maxStreak, 7) },
+    { id: 'streak30', ic: ['cal', '30'], cat: 'streak', name: 'Miesięczna passa', desc: 'Układaj 30 dni z rzędu.', test: (c) => cnt(c.maxStreak, 30) },
     // kostki
     { id: 'big', ic: ['cube7', ''], cat: 'puzzle', name: 'Wielka kostka', desc: 'Ułóż 7x7.', test: (c) => c.puzzles.has('777') },
     { id: 'minx', ic: ['pentagon', ''], cat: 'puzzle', name: 'Dwunastościan', desc: 'Ułóż Megaminxa.', test: (c) => c.puzzles.has('minx') },
@@ -148,7 +157,7 @@
     el.innerHTML = `
       <div class="ach-head">
         <div><b>${n}</b> / ${ACH.length} odblokowanych</div>
-        <div class="ach-streak">${Icons.icon('flame', '', 'ic-inline flame')} Seria: <b>${c.streak}</b> ${c.streak === 1 ? 'dzień' : 'dni'} · najdłuższa: ${c.maxStreak}</div>
+        <div class="ach-streak">${Icons.icon('flame', '', 'ic-inline flame')} Passa: <b>${c.streak}</b> ${c.streak === 1 ? 'dzień' : 'dni'} · najdłuższa: ${c.maxStreak}</div>
         <span class="ach-bar big"><i style="width:${(100 * n / ACH.length).toFixed(1)}%"></i></span>
       </div>
       <ul class="ach-list">${items}</ul>`;
@@ -260,5 +269,5 @@
     banner(`${badge(a, true)}<span><small>Osiągnięcie odblokowane</small><b>${a.name}</b>${more}</span>`, 'ach-pop', 3000);
   }
 
-  window.Progress = { dayKey, addDays, compute, check, renderAchievements, detectRecords, celebrate, announce, count: () => ACH.length };
+  window.Progress = { dayKey, addDays, lastStreak, compute, check, renderAchievements, detectRecords, celebrate, announce, count: () => ACH.length };
 })();

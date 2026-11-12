@@ -110,6 +110,12 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void setLastCall(boolean enabled) {
+            Reminders.prefs(MainActivity.this).edit().putBoolean("lastCall", enabled).apply();
+            Reminders.schedule(MainActivity.this);
+        }
+
+        @JavascriptInterface
         public void setStatus(String lastDay, int streak) {
             Reminders.prefs(MainActivity.this).edit()
                     .putString("lastDay", lastDay)
