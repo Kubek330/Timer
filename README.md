@@ -30,4 +30,4 @@ Czasy zapisują się w pamięci przeglądarki.
 Wystarczy otworzyć `index.html` w przeglądarce. Strona nie wymaga instalacji ani serwera,
 więc można ją opublikować na GitHub Pages.
 
-Czcionka cyfrowa: [DSEG](https://www.keshikan.net/fonts-e.html) (SIL Open Font License 1.1).
+Czcionki: [Nunito](https://fonts.google.com/specimen/Nunito) i cyfrowa [DSEG](https://www.keshikan.net/fonts-e.html), obie na licencji SIL Open Font License 1.1.

@@ -11,6 +11,7 @@
   const DEFAULT_SETTINGS = {
     inspection: false,
     celebrate: true,
+    timerFont: 'round',
     streakAnim: true,
     lastCall: true,
     reminder: false,
@@ -529,7 +530,7 @@
     const N = sv.length;
     if (N < 2) {
       ctx.fillStyle = col('--muted');
-      ctx.font = '14px system-ui';
+      ctx.font = "600 14px 'Nunito Variable', system-ui, sans-serif";
       ctx.textAlign = 'center';
       ctx.fillText('Ułóż co najmniej 2 razy, aby zobaczyć wykres', W / 2, H / 2);
       return;
@@ -548,7 +549,7 @@
     // siatka
     ctx.strokeStyle = col('--border');
     ctx.fillStyle = col('--muted');
-    ctx.font = '11px system-ui';
+    ctx.font = "600 11px 'Nunito Variable', system-ui, sans-serif";
     ctx.textAlign = 'right';
     ctx.lineWidth = 1;
     for (let k = 0; k <= 4; k++) {
@@ -753,6 +754,10 @@
   bindCheck('#setDraw', 'draw', renderScramble);
   bindCheck('#setCelebrate', 'celebrate');
   bindCheck('#setStreakAnim', 'streakAnim');
+  const applyTimerFont = () => document.body.classList.toggle('tf-round', S.timerFont === 'round');
+  $('#setTimerFont').value = S.timerFont;
+  $('#setTimerFont').addEventListener('change', (e) => { S.timerFont = e.target.value; save(); applyTimerFont(); e.target.blur(); });
+  applyTimerFont();
   $('#setHold').value = String(S.hold);
   $('#setHold').addEventListener('change', (e) => { S.hold = Number(e.target.value); save(); });
   $('#btnSettings').addEventListener('click', () => { renderThemes(); openModal('#modalSettings'); });
