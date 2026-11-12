@@ -11,6 +11,9 @@ Timer do kostki Rubika działający w przeglądarce, na komputerze i na telefoni
 - Kostka 3D „Jak pomieszać”: animacja scramble'a ruch po ruchu z opisem każdego ruchu (2x2–7x7)
 - Statystyki: najlepszy czas, średnia, mo3, ao5, ao12, ao50, ao100, ao1000 i wykres
 - Kary +2 i DNF, usuwanie czasów, szczegóły każdego ułożenia
+- Osiągnięcia (30 odznak), seria dni z rzędu i animacja nowego rekordu (pojedynczy, ao5, ao12)
+- Zaawansowane statystyki: historia dni, rozkład czasów, rekordy z datami, kalendarz aktywności, porównanie sesji
+- Codzienne przypomnienie o treningu w aplikacji na Androida (nie przychodzi, jeśli tego dnia już układałeś)
 - Sesje: tworzenie, zmiana nazwy, usuwanie, eksport i import do pliku JSON
 - 6 motywów kolorystycznych, tryb pełnoekranowy, tryb skupienia
 - Na telefonie dolny panel, który można schować lub wysunąć (stuknięcie albo przeciągnięcie)

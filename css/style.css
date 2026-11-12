@@ -614,3 +614,109 @@ body.in-app .web-only { display: none !important; }
   .c3d-stage { height: 32vh; }
   .c3d-controls { flex-wrap: wrap; }
 }
+
+/* ===== Zakładki statystyk ===== */
+.tab-strip {
+  display: flex; gap: 6px;
+  overflow-x: auto; scrollbar-width: none;
+  margin: 0 -2px 12px; padding: 2px;
+}
+.tab-strip::-webkit-scrollbar { display: none; }
+.tab-strip button {
+  flex: none;
+  height: 34px; padding: 0 14px;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: transparent; color: var(--text-2);
+  font-weight: 500; font-size: 14px;
+}
+.tab-strip button.on { background: var(--surface-3); border-color: var(--surface-3); color: var(--text); }
+.ins-filters { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+.ins-filters select { background: var(--surface-2); border: 0; border-radius: 9px; padding: 7px 8px; }
+.seg.mini { gap: 4px; }
+.seg.mini button { min-width: 0; height: 32px; padding: 0 10px; font-size: 13px; }
+.pane-sub { margin: 0 0 8px; }
+.ins-chart { width: 100%; display: block; background: var(--surface); border-radius: 12px; }
+.ins-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+.ins-kpis div { background: var(--surface); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ins-kpis span { color: var(--muted); font-size: 12px; }
+.ins-kpis b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.ins-h { font-size: 14px; margin: 18px 0 4px; color: var(--text-2); font-weight: 600; }
+.center { text-align: center; }
+.stats-table td.gain { color: var(--ready); }
+.table-scroll { overflow-x: auto; }
+.sess-table td small { display: block; color: var(--muted); font-size: 11px; }
+.sess-table th, .sess-table td { white-space: nowrap; }
+
+/* kalendarz aktywności */
+.hm-wrap { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.hm-days { display: grid; grid-template-rows: repeat(7, 14px); gap: 3px; font-size: 10px; color: var(--muted); line-height: 14px; }
+.hm-grid { display: grid; grid-template-rows: repeat(7, 14px); grid-auto-columns: 14px; gap: 3px; }
+.hm { display: block; width: 14px; height: 14px; border-radius: 3px; background: var(--surface-2); }
+.hm.l1 { background: color-mix(in srgb, var(--ready) 30%, var(--surface-2)); }
+.hm.l2 { background: color-mix(in srgb, var(--ready) 55%, var(--surface-2)); }
+.hm.l3 { background: color-mix(in srgb, var(--ready) 78%, var(--surface-2)); }
+.hm.l4 { background: var(--ready); }
+.hm.fut { opacity: .25; }
+.hm-legend { display: flex; align-items: center; gap: 3px; justify-content: flex-end; font-size: 11px; color: var(--muted); margin-top: 8px; }
+.hm-legend .hm { width: 11px; height: 11px; }
+
+/* osiągnięcia */
+.ach-head { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.ach-head b { font-size: 18px; }
+.ach-streak { color: var(--text-2); font-size: 14px; }
+.ach-bar { display: block; height: 5px; border-radius: 3px; background: var(--surface-2); overflow: hidden; margin-top: 6px; }
+.ach-bar.big { height: 8px; margin-top: 2px; }
+.ach-bar i { display: block; height: 100%; background: var(--ready); border-radius: inherit; }
+.ach-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ach { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); }
+.ach .ach-ico { font-size: 24px; width: 34px; text-align: center; filter: grayscale(1); opacity: .45; }
+.ach.on .ach-ico { filter: none; opacity: 1; }
+.ach-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ach-txt small { color: var(--muted); font-size: 12px; }
+.ach:not(.on) .ach-txt b { color: var(--text-2); }
+.ach-num { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ach-date { font-size: 11px; color: var(--muted); flex: none; }
+
+/* baner rekordu / osiągnięcia i konfetti */
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 70; }
+.cc-banner {
+  position: fixed; left: 50%; top: calc(76px + env(safe-area-inset-top, 0px));
+  transform: translate(-50%, -16px); opacity: 0;
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1), opacity .3s;
+  z-index: 71; pointer-events: none;
+  background: var(--surface-2); color: var(--text);
+  border: 1px solid var(--surface-3);
+  border-radius: 16px; padding: 12px 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+  min-width: 220px; max-width: calc(100vw - 32px);
+}
+.cc-banner.show { transform: translate(-50%, 0); opacity: 1; }
+.cc-banner.record { border-color: var(--ready); }
+.rec-title { font-weight: 800; font-size: 18px; text-align: center; margin-bottom: 6px; }
+.rec-row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: baseline; font-variant-numeric: tabular-nums; padding: 2px 0; }
+.rec-row span { color: var(--text-2); }
+.rec-row b { font-size: 17px; }
+.rec-row em { font-style: normal; color: var(--ready); font-weight: 600; }
+.cc-banner.ach-pop { display: flex; align-items: center; gap: 12px; }
+.cc-banner.ach-pop .ach-ico { font-size: 30px; }
+.cc-banner.ach-pop span { display: flex; flex-direction: column; }
+.cc-banner.ach-pop small { color: var(--muted); font-size: 12px; }
+@media (prefers-reduced-motion: reduce) { .cc-banner { transition: none; } }
+
+/* przypomnienia */
+.remind { gap: 4px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.opt-in { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 6px 0; }
+.opt-in input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--ready); }
+.opt-in input[type="time"] { background: var(--surface-2); border: 0; border-radius: 8px; padding: 6px 8px; color: var(--text); }
+.opt-in input:disabled { opacity: .4; }
+.remind p { margin: 2px 0 0; }
+
+@media (max-width: 760px) {
+  .ins-kpis { grid-template-columns: repeat(2, 1fr); }
+  .top-actions .icon-btn { width: 38px; height: 38px; }
+  .top-actions { gap: 5px; }
+  .brand-name { font-size: 18px; }
+}
+@media (max-width: 370px) {
+  .brand-name { display: none; }
+}

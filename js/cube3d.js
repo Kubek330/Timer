@@ -87,6 +87,7 @@
     if (nextBtn) nextBtn.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     if (step >= moves.length) {
       $('#c3dStep').textContent = `Gotowe! Wszystkie ${moves.length} ruchów wykonane.`;
+      if (moves.length && window.Cube3D.onFinish) window.Cube3D.onFinish();
       $('#c3dDesc').textContent = 'Kostka jest pomieszana. Możesz zaczynać układanie.';
     } else {
       $('#c3dStep').innerHTML = `Ruch ${step + 1} z ${moves.length}: <b>${moves[step]}</b>`;

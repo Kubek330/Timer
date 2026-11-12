@@ -1,11 +1,15 @@
 package pl.cubeclock.app;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -17,6 +21,7 @@ import android.webkit.WebViewClient;
 public class MainActivity extends Activity {
 
     private WebView web;
+    private static final int REQ_NOTIF = 7;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -53,6 +58,9 @@ public class MainActivity extends Activity {
             }
         });
 
+        // most dla strony: przypomnienia i stan treningu
+        web.addJavascriptInterface(new Bridge(), "CCNative");
+
         setContentView(web);
 
         if (savedInstanceState != null) {
@@ -87,6 +95,56 @@ public class MainActivity extends Activity {
         web.evaluateJavascript("(window.ccBack && window.ccBack()) ? 'y' : 'n'", (result) -> {
             if (result == null || !result.contains("y")) MainActivity.super.onBackPressed();
         });
+    }
+
+    /** Metody wywoływane ze strony przez window.CCNative. */
+    public class Bridge {
+        @JavascriptInterface
+        public void setReminder(boolean enabled, int hour, int minute) {
+            Reminders.prefs(MainActivity.this).edit()
+                    .putBoolean("enabled", enabled)
+                    .putInt("hour", hour)
+                    .putInt("minute", minute)
+                    .apply();
+            Reminders.schedule(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public void setStatus(String lastDay, int streak) {
+            Reminders.prefs(MainActivity.this).edit()
+                    .putString("lastDay", lastDay)
+                    .putInt("streak", streak)
+                    .apply();
+        }
+
+        @JavascriptInterface
+        public boolean notificationsAllowed() {
+            return Reminders.allowed(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public void requestNotifications() {
+            runOnUiThread(() -> {
+                if (Build.VERSION.SDK_INT >= 33
+                        && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQ_NOTIF);
+                } else {
+                    notifResult(Reminders.allowed(MainActivity.this));
+                }
+            });
+        }
+    }
+
+    private void notifResult(boolean granted) {
+        web.evaluateJavascript("window.ccNotifResult && window.ccNotifResult(" + granted + ")", null);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_NOTIF) {
+            notifResult(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED);
+        }
     }
 
     @Override

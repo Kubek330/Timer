@@ -10,6 +10,9 @@
   /* ================= Dane ================= */
   const DEFAULT_SETTINGS = {
     inspection: false,
+    celebrate: true,
+    reminder: false,
+    reminderTime: '18:00',
     inspSound: true,
     hold: 300,
     runMode: '0.1', // dokładność czasu w trakcie ułożenia: 0.01 | 0.1 | 1 | none
@@ -253,6 +256,7 @@
     clearTimeout(holdTimer);
     const s = session();
     const solve = { id: uid(), time, penalty: pen || 0, scramble, date: Date.now(), puzzle: s.puzzle };
+    if (S.inspection) solve.insp = true;
     s.solves.push(solve);
     lastSolveId = solve.id;
     pendingPen = 0;
@@ -260,9 +264,14 @@
     setState('idle');
     setColor(null);
     showLast();
+    const recs = Progress.detectRecords(data, s);
+    const fresh = Progress.check(data);
     save();
     newScramble();
     renderStats();
+    if (S.celebrate) Progress.celebrate(recs, fmt);
+    Progress.announce(fresh);
+    syncNative();
   }
 
   function showLast() {
@@ -380,8 +389,10 @@
       s.solves[i].penalty = pen === 'DNF' ? 'DNF' : Number(pen);
       if (id === lastSolveId) showLast();
     }
+    Progress.announce(Progress.check(data));
     save();
     renderStats();
+    syncNative();
   }
 
   /* ================= Statystyki i lista ================= */
@@ -416,7 +427,7 @@
     }
     list.innerHTML = html;
     $('#timesEmpty').hidden = sv.length > 0;
-    if (!$('#modalStats').hidden) renderStatsModal();
+    if (!$('#modalStats').hidden && ins.tab === 'session') renderStatsModal();
   }
 
   $('#timesList').addEventListener('click', (e) => {
@@ -536,8 +547,53 @@
     line(ao12, col('--chart-3'), 2);
   }
 
-  $('#btnStats').addEventListener('click', () => { openModal('#modalStats'); renderStatsModal(); });
-  window.addEventListener('resize', () => { if (!$('#modalStats').hidden) renderStatsModal(); });
+  // zakładki statystyk: "Sesja" to bieżąca sesja, reszta to statystyki ze wszystkich sesji
+  const ins = { tab: 'session', puzzle: null, range: 'all' };
+  $('#insPuzzle').innerHTML = Object.entries(Scramble.PUZZLES).map(([k, p]) => `<option value="${k}">${p.name}</option>`).join('');
+  function renderStatsView() {
+    $$('#statsTabs button').forEach((b) => b.classList.toggle('on', b.dataset.st === ins.tab));
+    const isSession = ins.tab === 'session';
+    $('#paneSession').hidden = !isSession;
+    $('#insightPane').hidden = isSession;
+    $('#insFilters').hidden = !['history', 'dist', 'records'].includes(ins.tab);
+    $('#insRange').hidden = ins.tab === 'records';
+    $$('#insRange button').forEach((b) => b.classList.toggle('on', b.dataset.r === ins.range));
+    $('#insPuzzle').value = ins.puzzle;
+    if (isSession) renderStatsModal();
+    else Insights.render($('#insightPane'), data, ins, fmt);
+  }
+  $('#statsTabs').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    ins.tab = b.dataset.st;
+    renderStatsView();
+  });
+  $('#insRange').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    ins.range = b.dataset.r;
+    renderStatsView();
+  });
+  $('#insPuzzle').addEventListener('change', (e) => { ins.puzzle = e.target.value; renderStatsView(); });
+  $('#btnStats').addEventListener('click', () => {
+    ins.puzzle = session().puzzle;
+    openModal('#modalStats');
+    renderStatsView();
+  });
+  window.addEventListener('resize', () => { if (!$('#modalStats').hidden) renderStatsView(); });
+
+  // osiągnięcia
+  $('#btnAch').addEventListener('click', () => {
+    Progress.renderAchievements(data, $('#achBody'));
+    openModal('#modalAch');
+  });
+  Cube3D.onFinish = () => {
+    data.flags = data.flags || {};
+    if (data.flags.guide) return;
+    data.flags.guide = true;
+    Progress.announce(Progress.check(data));
+    save();
+  };
 
   // --- sesje ---
   function renderSessions() {
@@ -670,6 +726,7 @@
   $('#setRunMode').addEventListener('change', (e) => { S.runMode = e.target.value; save(); e.target.blur(); });
   bindCheck('#setFocus', 'focus', () => document.body.classList.toggle('focus', S.focus));
   bindCheck('#setDraw', 'draw', renderScramble);
+  bindCheck('#setCelebrate', 'celebrate');
   $('#setHold').value = String(S.hold);
   $('#setHold').addEventListener('change', (e) => { S.hold = Number(e.target.value); save(); });
   $('#btnSettings').addEventListener('click', () => { renderThemes(); openModal('#modalSettings'); });
@@ -767,13 +824,70 @@
     return false;
   };
 
+  /* ================= Przypomnienia (aplikacja na Androida) ================= */
+  const native = window.CCNative || null;
+  // przekazuje aplikacji dzień ostatniego ułożenia i serię, żeby przypomnienie nie przychodziło po treningu
+  function syncNative() {
+    if (!native) return;
+    try {
+      const c = Progress.compute(data);
+      const last = c.all.length ? Progress.dayKey(c.all[c.all.length - 1].date) : '';
+      native.setStatus(last, c.streak);
+    } catch (e) { /* stara wersja aplikacji */ }
+  }
+  function applyReminder() {
+    if (!native) return;
+    const [h, m] = (S.reminderTime || '18:00').split(':').map(Number);
+    try { native.setReminder(!!S.reminder, h, m); } catch (e) { /* stara wersja aplikacji */ }
+  }
+  (function reminderUI() {
+    const box = $('#setReminder');
+    const time = $('#setReminderTime');
+    box.checked = !!S.reminder && !!native;
+    time.value = S.reminderTime;
+    if (!native) {
+      box.disabled = true;
+      time.disabled = true;
+      $('#reminderNote').textContent = 'Przypomnienia działają w aplikacji CubeClock na Androida.';
+      return;
+    }
+    $('#reminderNote').textContent = 'Przychodzi tylko w dni, w które jeszcze nie układałeś. Przypomina też o serii dni.';
+    window.ccNotifResult = (granted) => {
+      if (!granted) {
+        S.reminder = false;
+        box.checked = false;
+        toast('Bez zgody na powiadomienia przypomnienie nie zadziała');
+      }
+      save();
+      applyReminder();
+    };
+    box.addEventListener('change', () => {
+      S.reminder = box.checked;
+      save();
+      if (S.reminder) {
+        try { native.requestNotifications(); } catch (e) { window.ccNotifResult(true); }
+      } else applyReminder();
+    });
+    time.addEventListener('change', () => {
+      if (!time.value) return;
+      S.reminderTime = time.value;
+      save();
+      applyReminder();
+      toast('Przypomnienie o ' + time.value);
+    });
+  })();
+
   /* ================= Start ================= */
   applyTheme();
   applyPanel();
   document.body.classList.toggle('focus', !!S.focus);
   syncPuzzle();
   newScramble();
+  Progress.check(data); // osiągnięcia za wcześniejsze ułożenia, bez ogłaszania
+  save();
   renderStats();
+  syncNative();
+  applyReminder();
   setState('idle');
   setDigits('0.00');
   MOBILE.addEventListener && MOBILE.addEventListener('change', setHint);

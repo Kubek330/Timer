@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ikona powiadomienia: jednokolorowa kostka -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF" android:pathData="M12,2.5 L20.5,7 L12,11.5 L3.5,7 Z" />
+    <path android:fillColor="#B3FFFFFF" android:pathData="M3.5,8 L11.4,12.2 L11.4,21.3 L3.5,17 Z" />
+    <path android:fillColor="#80FFFFFF" android:pathData="M20.5,8 L12.6,12.2 L12.6,21.3 L20.5,17 Z" />
+</vector>
