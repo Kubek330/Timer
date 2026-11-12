@@ -98,10 +98,10 @@ public class Reminders extends BroadcastReceiver {
         String title;
         String text;
         if (streakAlive) {
-            title = "Nie przerwij serii! 🔥";
+            title = "Nie przerwij serii!";
             text = "Masz " + streak + (streak == 1 ? " dzień" : " dni") + " z rzędu. Ułóż dziś kostkę chociaż raz.";
         } else {
-            title = "Czas na kostkę 🧊";
+            title = "Czas na kostkę";
             text = "Ułóż dziś chociaż raz i zacznij nową serię.";
         }
 

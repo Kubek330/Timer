@@ -204,7 +204,7 @@
     }
     el.insertAdjacentHTML('beforeend', `
       <div class="ins-kpis">
-        <div><span>Seria</span><b>🔥 ${c.streak}</b></div>
+        <div><span>Seria</span><b>${Icons.icon('flame', '', 'ic-inline flame')} ${c.streak}</b></div>
         <div><span>Najdłuższa seria</span><b>${c.maxStreak}</b></div>
         <div><span>Dni z kostką</span><b>${Object.keys(c.perDay).length}</b></div>
         <div><span>W tym miesiącu</span><b>${monthSolves}</b></div>

@@ -77,43 +77,48 @@
   const cnt = (cur, target) => [Math.min(cur, target), target];
   const ACH = [
     // ułożenia
-    { id: 'first', icon: '🧊', name: 'Pierwsze ułożenie', desc: 'Ułóż kostkę pierwszy raz.', test: (c) => cnt(c.total, 1) },
-    { id: 's10', icon: '🔟', name: 'Rozgrzewka', desc: 'Ułóż kostkę 10 razy.', test: (c) => cnt(c.total, 10) },
-    { id: 's50', icon: '💪', name: 'Wkręcony', desc: 'Ułóż kostkę 50 razy.', test: (c) => cnt(c.total, 50) },
-    { id: 's100', icon: '💯', name: 'Setka', desc: 'Ułóż kostkę 100 razy.', test: (c) => cnt(c.total, 100) },
-    { id: 's500', icon: '🏋️', name: 'Pracuś', desc: 'Ułóż kostkę 500 razy.', test: (c) => cnt(c.total, 500) },
-    { id: 's1000', icon: '👑', name: 'Tysiącznik', desc: 'Ułóż kostkę 1000 razy.', test: (c) => cnt(c.total, 1000) },
-    { id: 'day50', icon: '🏃', name: 'Maraton', desc: 'Ułóż kostkę 50 razy jednego dnia.', test: (c) => cnt(c.maxPerDay, 50) },
+    { id: 'first', ic: ['cube', ''], cat: 'count', name: 'Pierwsze ułożenie', desc: 'Ułóż kostkę pierwszy raz.', test: (c) => cnt(c.total, 1) },
+    { id: 's10', ic: ['count', '10'], cat: 'count', name: 'Rozgrzewka', desc: 'Ułóż kostkę 10 razy.', test: (c) => cnt(c.total, 10) },
+    { id: 's50', ic: ['count', '50'], cat: 'count', name: 'Wkręcony', desc: 'Ułóż kostkę 50 razy.', test: (c) => cnt(c.total, 50) },
+    { id: 's100', ic: ['count', '100'], cat: 'count', name: 'Setka', desc: 'Ułóż kostkę 100 razy.', test: (c) => cnt(c.total, 100) },
+    { id: 's500', ic: ['count', '500'], cat: 'count', name: 'Pracuś', desc: 'Ułóż kostkę 500 razy.', test: (c) => cnt(c.total, 500) },
+    { id: 's1000', ic: ['count', '1K'], cat: 'count', name: 'Tysiącznik', desc: 'Ułóż kostkę 1000 razy.', test: (c) => cnt(c.total, 1000) },
+    { id: 'day50', ic: ['run', ''], cat: 'count', name: 'Maraton', desc: 'Ułóż kostkę 50 razy jednego dnia.', test: (c) => cnt(c.maxPerDay, 50) },
     // czasy 3x3
-    { id: 'sub60', icon: '⏱️', name: 'Poniżej minuty', desc: 'Ułóż 3x3 w mniej niż 60 s.', test: (c) => sub(c.single333, 60) },
-    { id: 'sub45', icon: '🚶', name: 'Sub-45', desc: 'Ułóż 3x3 w mniej niż 45 s.', test: (c) => sub(c.single333, 45) },
-    { id: 'sub30', icon: '🚴', name: 'Sub-30', desc: 'Ułóż 3x3 w mniej niż 30 s.', test: (c) => sub(c.single333, 30) },
-    { id: 'sub20', icon: '🏎️', name: 'Sub-20', desc: 'Ułóż 3x3 w mniej niż 20 s.', test: (c) => sub(c.single333, 20) },
-    { id: 'sub15', icon: '🚀', name: 'Sub-15', desc: 'Ułóż 3x3 w mniej niż 15 s.', test: (c) => sub(c.single333, 15) },
-    { id: 'sub10', icon: '⚡', name: 'Sub-10', desc: 'Ułóż 3x3 w mniej niż 10 s.', test: (c) => sub(c.single333, 10) },
-    { id: 'ao5s30', icon: '📉', name: 'Stabilna trzydziestka', desc: 'Średnia ao5 na 3x3 poniżej 30 s.', test: (c) => sub(c.ao5_333, 30) },
-    { id: 'ao5s20', icon: '📈', name: 'Stabilna dwudziestka', desc: 'Średnia ao5 na 3x3 poniżej 20 s.', test: (c) => sub(c.ao5_333, 20) },
-    { id: 'ao12s30', icon: '🎯', name: 'Równa forma', desc: 'Średnia ao12 na 3x3 poniżej 30 s.', test: (c) => sub(c.ao12_333, 30) },
-    { id: 'sub5_222', icon: '🎲', name: 'Mały, ale szybki', desc: 'Ułóż 2x2 w mniej niż 5 s.', test: (c) => sub(c.single222, 5) },
-    { id: 'clean12', icon: '✨', name: 'Czysta dwunastka', desc: '12 ułożeń z rzędu bez +2 i DNF.', test: (c) => cnt(c.cleanRun, 12) },
+    { id: 'sub60', ic: ['watch', '60'], cat: 'speed', name: 'Poniżej minuty', desc: 'Ułóż 3x3 w mniej niż 60 s.', test: (c) => sub(c.single333, 60) },
+    { id: 'sub45', ic: ['watch', '45'], cat: 'speed', name: 'Sub-45', desc: 'Ułóż 3x3 w mniej niż 45 s.', test: (c) => sub(c.single333, 45) },
+    { id: 'sub30', ic: ['watch', '30'], cat: 'speed', name: 'Sub-30', desc: 'Ułóż 3x3 w mniej niż 30 s.', test: (c) => sub(c.single333, 30) },
+    { id: 'sub20', ic: ['watch', '20'], cat: 'speed', name: 'Sub-20', desc: 'Ułóż 3x3 w mniej niż 20 s.', test: (c) => sub(c.single333, 20) },
+    { id: 'sub15', ic: ['watch', '15'], cat: 'speed', name: 'Sub-15', desc: 'Ułóż 3x3 w mniej niż 15 s.', test: (c) => sub(c.single333, 15) },
+    { id: 'sub10', ic: ['watch', '10'], cat: 'speed', name: 'Sub-10', desc: 'Ułóż 3x3 w mniej niż 10 s.', test: (c) => sub(c.single333, 10) },
+    { id: 'ao5s30', ic: ['avg', '30'], cat: 'speed', name: 'Stabilna trzydziestka', desc: 'Średnia ao5 na 3x3 poniżej 30 s.', test: (c) => sub(c.ao5_333, 30) },
+    { id: 'ao5s20', ic: ['avg', '20'], cat: 'speed', name: 'Stabilna dwudziestka', desc: 'Średnia ao5 na 3x3 poniżej 20 s.', test: (c) => sub(c.ao5_333, 20) },
+    { id: 'ao12s30', ic: ['target', ''], cat: 'speed', name: 'Równa forma', desc: 'Średnia ao12 na 3x3 poniżej 30 s.', test: (c) => sub(c.ao12_333, 30) },
+    { id: 'sub5_222', ic: ['cube2', ''], cat: 'speed', name: 'Mały, ale szybki', desc: 'Ułóż 2x2 w mniej niż 5 s.', test: (c) => sub(c.single222, 5) },
+    { id: 'clean12', ic: ['sparkle', ''], cat: 'speed', name: 'Czysta dwunastka', desc: '12 ułożeń z rzędu bez +2 i DNF.', test: (c) => cnt(c.cleanRun, 12) },
     // serie dni
-    { id: 'streak3', icon: '🔥', name: 'Seria 3 dni', desc: 'Układaj 3 dni z rzędu.', test: (c) => cnt(c.maxStreak, 3) },
-    { id: 'streak7', icon: '🔥', name: 'Tydzień z kostką', desc: 'Układaj 7 dni z rzędu.', test: (c) => cnt(c.maxStreak, 7) },
-    { id: 'streak30', icon: '🌋', name: 'Miesiąc bez przerwy', desc: 'Układaj 30 dni z rzędu.', test: (c) => cnt(c.maxStreak, 30) },
+    { id: 'streak3', ic: ['flame', '3'], cat: 'streak', name: 'Seria 3 dni', desc: 'Układaj 3 dni z rzędu.', test: (c) => cnt(c.maxStreak, 3) },
+    { id: 'streak7', ic: ['flame', '7'], cat: 'streak', name: 'Tydzień z kostką', desc: 'Układaj 7 dni z rzędu.', test: (c) => cnt(c.maxStreak, 7) },
+    { id: 'streak30', ic: ['cal', '30'], cat: 'streak', name: 'Miesiąc bez przerwy', desc: 'Układaj 30 dni z rzędu.', test: (c) => cnt(c.maxStreak, 30) },
     // kostki
-    { id: 'big', icon: '🧱', name: 'Wielka kostka', desc: 'Ułóż 7x7.', test: (c) => c.puzzles.has('777') },
-    { id: 'minx', icon: '⚽', name: 'Dwunastościan', desc: 'Ułóż Megaminxa.', test: (c) => c.puzzles.has('minx') },
-    { id: 'nxn', icon: '📦', name: 'Cała rodzina', desc: 'Ułóż każdą kostkę od 2x2 do 7x7.', test: (c) => cnt(['222', '333', '444', '555', '666', '777'].filter((p) => c.puzzles.has(p)).length, 6) },
-    { id: 'collector', icon: '🗃️', name: 'Kolekcjoner', desc: 'Ułóż 5 różnych łamigłówek.', test: (c) => cnt(c.puzzles.size, 5) },
+    { id: 'big', ic: ['cube7', ''], cat: 'puzzle', name: 'Wielka kostka', desc: 'Ułóż 7x7.', test: (c) => c.puzzles.has('777') },
+    { id: 'minx', ic: ['pentagon', ''], cat: 'puzzle', name: 'Dwunastościan', desc: 'Ułóż Megaminxa.', test: (c) => c.puzzles.has('minx') },
+    { id: 'nxn', ic: ['stack', ''], cat: 'puzzle', name: 'Cała rodzina', desc: 'Ułóż każdą kostkę od 2x2 do 7x7.', test: (c) => cnt(['222', '333', '444', '555', '666', '777'].filter((p) => c.puzzles.has(p)).length, 6) },
+    { id: 'collector', ic: ['shapes', ''], cat: 'puzzle', name: 'Kolekcjoner', desc: 'Ułóż 5 różnych łamigłówek.', test: (c) => cnt(c.puzzles.size, 5) },
     // inne
-    { id: 'insp10', icon: '👀', name: 'Jak na zawodach', desc: '10 ułożeń z inspekcją 15 s.', test: (c) => cnt(c.inspected, 10) },
-    { id: 'guide', icon: '🧭', name: 'Mistrz mieszania', desc: 'Przejdź cały scramble w podglądzie 3D.', test: (c) => !!c.flags.guide },
-    { id: 'night', icon: '🦉', name: 'Nocny marek', desc: 'Ułóż kostkę między północą a 4:00.', test: (c) => c.night },
-    { id: 'morning', icon: '🐦', name: 'Ranny ptaszek', desc: 'Ułóż kostkę między 4:00 a 6:00.', test: (c) => c.morning },
-    { id: 'dnf', icon: '🙈', name: 'Bywa i tak', desc: 'Zdobądź pierwszy DNF.', test: (c) => cnt(c.dnf, 1) },
+    { id: 'insp10', ic: ['eye', ''], cat: 'other', name: 'Jak na zawodach', desc: '10 ułożeń z inspekcją 15 s.', test: (c) => cnt(c.inspected, 10) },
+    { id: 'guide', ic: ['compass', ''], cat: 'other', name: 'Mistrz mieszania', desc: 'Przejdź cały scramble w podglądzie 3D.', test: (c) => !!c.flags.guide },
+    { id: 'night', ic: ['moon', ''], cat: 'other', name: 'Nocny marek', desc: 'Ułóż kostkę między północą a 4:00.', test: (c) => c.night },
+    { id: 'morning', ic: ['sunrise', ''], cat: 'other', name: 'Ranny ptaszek', desc: 'Ułóż kostkę między 4:00 a 6:00.', test: (c) => c.morning },
+    { id: 'dnf', ic: ['dnf', ''], cat: 'other', name: 'Bywa i tak', desc: 'Zdobądź pierwszy DNF.', test: (c) => cnt(c.dnf, 1) },
   ];
 
   const done = (r) => (Array.isArray(r) ? r[0] >= r[1] : !!r);
+
+  // odznaka: sześciokąt w kolorze kategorii z ikoną w środku
+  function badge(a, on) {
+    return `<span class="badge cat-${a.cat}${on ? ' lit' : ''}"><svg class="badge-bg" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2.5 35.2 11.25v17.5L20 37.5 4.8 28.75v-17.5z"/></svg>${Icons.icon(a.ic[0], a.ic[1], 'badge-ic')}</span>`;
+  }
 
   // sprawdza osiągnięcia; zwraca nowo odblokowane
   function check(data, ctx) {
@@ -138,12 +143,12 @@
         ? `<span class="ach-bar"><i style="width:${(100 * r[0] / r[1]).toFixed(1)}%"></i></span><span class="ach-num">${r[0]} / ${r[1]}</span>`
         : '';
       const when = has ? `<span class="ach-date">${new Date(got[a.id]).toLocaleDateString('pl-PL')}</span>` : '';
-      return `<li class="ach${has ? ' on' : ''}"><span class="ach-ico">${a.icon}</span><span class="ach-txt"><b>${a.name}</b><small>${a.desc}</small>${prog}</span>${when}</li>`;
+      return `<li class="ach${has ? ' on' : ''}">${badge(a)}<span class="ach-txt"><b>${a.name}</b><small>${a.desc}</small>${prog}</span>${when}</li>`;
     }).join('');
     el.innerHTML = `
       <div class="ach-head">
         <div><b>${n}</b> / ${ACH.length} odblokowanych</div>
-        <div class="ach-streak">🔥 Seria: <b>${c.streak}</b> ${c.streak === 1 ? 'dzień' : 'dni'} · najdłuższa: ${c.maxStreak}</div>
+        <div class="ach-streak">${Icons.icon('flame', '', 'ic-inline flame')} Seria: <b>${c.streak}</b> ${c.streak === 1 ? 'dzień' : 'dni'} · najdłuższa: ${c.maxStreak}</div>
         <span class="ach-bar big"><i style="width:${(100 * n / ACH.length).toFixed(1)}%"></i></span>
       </div>
       <ul class="ach-list">${items}</ul>`;
@@ -243,7 +248,7 @@
   function celebrate(records, fmt) {
     if (!records.length) return;
     const rows = records.map((r) => `<div class="rec-row"><span>${r.label}</span><b>${fmt(r.value)}</b><em>−${fmt(r.prev - r.value)}</em></div>`).join('');
-    banner(`<div class="rec-title">🎉 Nowy rekord!</div>${rows}`, 'record', 3600);
+    banner(`<div class="rec-title">${Icons.icon('trophy', '', 'ic-inline')} Nowy rekord!</div>${rows}`, 'record', 3600);
     confetti();
     if (navigator.vibrate) { try { navigator.vibrate([30, 60, 30]); } catch (e) { /* brak wibracji */ } }
   }
@@ -252,7 +257,7 @@
     if (!list.length) return;
     const a = list[0];
     const more = list.length > 1 ? `<small>i jeszcze ${list.length - 1}</small>` : '';
-    banner(`<span class="ach-ico">${a.icon}</span><span><small>Osiągnięcie odblokowane</small><b>${a.name}</b>${more}</span>`, 'ach-pop', 3000);
+    banner(`${badge(a, true)}<span><small>Osiągnięcie odblokowane</small><b>${a.name}</b>${more}</span>`, 'ach-pop', 3000);
   }
 
   window.Progress = { dayKey, addDays, compute, check, renderAchievements, detectRecords, celebrate, announce, count: () => ACH.length };

@@ -669,8 +669,6 @@ body.in-app .web-only { display: none !important; }
 .ach-bar i { display: block; height: 100%; background: var(--ready); border-radius: inherit; }
 .ach-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .ach { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); }
-.ach .ach-ico { font-size: 24px; width: 34px; text-align: center; filter: grayscale(1); opacity: .45; }
-.ach.on .ach-ico { filter: none; opacity: 1; }
 .ach-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .ach-txt small { color: var(--muted); font-size: 12px; }
 .ach:not(.on) .ach-txt b { color: var(--text-2); }
@@ -698,7 +696,6 @@ body.in-app .web-only { display: none !important; }
 .rec-row b { font-size: 17px; }
 .rec-row em { font-style: normal; color: var(--ready); font-weight: 600; }
 .cc-banner.ach-pop { display: flex; align-items: center; gap: 12px; }
-.cc-banner.ach-pop .ach-ico { font-size: 30px; }
 .cc-banner.ach-pop span { display: flex; flex-direction: column; }
 .cc-banner.ach-pop small { color: var(--muted); font-size: 12px; }
 @media (prefers-reduced-motion: reduce) { .cc-banner { transition: none; } }
@@ -720,3 +717,21 @@ body.in-app .web-only { display: none !important; }
 @media (max-width: 370px) {
   .brand-name { display: none; }
 }
+
+/* odznaki osiągnięć (własne ikony) */
+.cat-count { --cat: #4aa3ff; }
+.cat-speed { --cat: #36d16b; }
+.cat-streak { --cat: #ff8a3d; }
+.cat-puzzle { --cat: #b38cff; }
+.cat-other { --cat: #e3c04b; }
+.badge { position: relative; flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: var(--muted); }
+.badge-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.badge-bg path { fill: var(--surface-2); stroke: var(--border); stroke-width: 1.5; }
+.badge-ic { position: relative; width: 24px; height: 24px; }
+.ach.on .badge, .badge.lit { color: var(--cat); }
+.ach.on .badge-bg path, .badge.lit .badge-bg path { fill: color-mix(in srgb, var(--cat) 16%, var(--surface)); stroke: color-mix(in srgb, var(--cat) 70%, transparent); }
+.cc-banner .badge { width: 48px; height: 48px; }
+.ic-inline { width: 1.15em; height: 1.15em; vertical-align: -0.2em; }
+.ic-inline.flame { color: #ff8a3d; }
+.rec-title .ic-inline { color: var(--ready); margin-right: 4px; }
+#c3dReset svg { width: 18px; height: 18px; }
