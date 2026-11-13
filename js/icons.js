@@ -3,7 +3,7 @@
   'use strict';
 
   const svg = (body, cls) => `<svg class="${cls || 'ic'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
-  const num = (n, y, size) => `<text x="12" y="${y}" text-anchor="middle" fill="currentColor" stroke="none" font-family="'Nunito Variable', system-ui, sans-serif" font-weight="800" font-size="${size}">${n}</text>`;
+  const num = (n, y, size) => `<text x="12" y="${y}" text-anchor="middle" fill="currentColor" stroke="none" font-family="'Rubik Variable', system-ui, sans-serif" font-weight="800" font-size="${size}">${n}</text>`;
 
   // każdy rysunek mieści się w polu 24x24
   const DRAW = {

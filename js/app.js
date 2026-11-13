@@ -530,7 +530,7 @@
     const N = sv.length;
     if (N < 2) {
       ctx.fillStyle = col('--muted');
-      ctx.font = "600 14px 'Nunito Variable', system-ui, sans-serif";
+      ctx.font = "500 14px 'Rubik Variable', system-ui, sans-serif";
       ctx.textAlign = 'center';
       ctx.fillText('Ułóż co najmniej 2 razy, aby zobaczyć wykres', W / 2, H / 2);
       return;
@@ -549,7 +549,7 @@
     // siatka
     ctx.strokeStyle = col('--border');
     ctx.fillStyle = col('--muted');
-    ctx.font = "600 11px 'Nunito Variable', system-ui, sans-serif";
+    ctx.font = "500 11px 'Rubik Variable', system-ui, sans-serif";
     ctx.textAlign = 'right';
     ctx.lineWidth = 1;
     for (let k = 0; k <= 4; k++) {
