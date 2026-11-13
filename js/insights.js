@@ -68,7 +68,7 @@
     const padL = 48, padR = 12, padT = 12, padB = 26;
     const x = (i) => padL + (W - padL - padR) * (i / (rows.length - 1));
     const y = (v) => padT + (H - padT - padB) * (1 - (v - lo) / (hi - lo));
-    ctx.font = "500 11px 'Rubik Variable', system-ui, sans-serif";
+    ctx.font = '11px system-ui';
     ctx.lineWidth = 1;
     ctx.strokeStyle = col('--border');
     ctx.fillStyle = col('--muted');
@@ -117,7 +117,7 @@
     const { ctx, W, H } = canvas(el, 230);
     const padL = 30, padR = 10, padT = 14, padB = 30;
     const bw = (W - padL - padR) / nb;
-    ctx.font = "500 11px 'Rubik Variable', system-ui, sans-serif";
+    ctx.font = '11px system-ui';
     ctx.fillStyle = col('--muted');
     ctx.strokeStyle = col('--border');
     ctx.textAlign = 'right';
