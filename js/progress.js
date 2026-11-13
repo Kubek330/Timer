@@ -54,6 +54,7 @@
       streak: streak(perDay),
       maxStreak: maxStreak(perDay),
       flags: data.flags || {},
+      f2l: Object.keys((data.f2l && data.f2l.stats) || {}).length,
     };
   }
 
@@ -115,6 +116,8 @@
     { id: 'nxn', ic: ['stack', ''], cat: 'puzzle', name: 'Cała rodzina', desc: 'Ułóż każdą kostkę od 2x2 do 7x7.', test: (c) => cnt(['222', '333', '444', '555', '666', '777'].filter((p) => c.puzzles.has(p)).length, 6) },
     { id: 'collector', ic: ['shapes', ''], cat: 'puzzle', name: 'Kolekcjoner', desc: 'Ułóż 5 różnych łamigłówek.', test: (c) => cnt(c.puzzles.size, 5) },
     // inne
+    { id: 'f2l1', ic: ['pair', ''], cat: 'other', name: 'Pierwsza para', desc: 'Przećwicz przypadek w trenerze F2L.', test: (c) => cnt(c.f2l, 1) },
+    { id: 'f2l41', ic: ['pair', '41'], cat: 'other', name: 'Mistrz F2L', desc: 'Przećwicz wszystkie 41 przypadków F2L.', test: (c) => cnt(c.f2l, 41) },
     { id: 'insp10', ic: ['eye', ''], cat: 'other', name: 'Jak na zawodach', desc: '10 ułożeń z inspekcją 15 s.', test: (c) => cnt(c.inspected, 10) },
     { id: 'guide', ic: ['compass', ''], cat: 'other', name: 'Mistrz mieszania', desc: 'Przejdź cały scramble w podglądzie 3D.', test: (c) => !!c.flags.guide },
     { id: 'night', ic: ['moon', ''], cat: 'other', name: 'Nocny marek', desc: 'Ułóż kostkę między północą a 4:00.', test: (c) => c.night },

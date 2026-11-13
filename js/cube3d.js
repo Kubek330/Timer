@@ -221,7 +221,111 @@
     window.addEventListener('resize', () => { if (!$('#modal3d').hidden) layout(); });
   }
 
+  /**
+   * Samodzielny widok kostki 3D (np. dla trenera F2L): ustawianie stanu, animacja ruchów,
+   * obracanie palcem i opcjonalne szarzenie naklejek (mask(p) === true -> szara).
+   */
+  class View {
+    constructor(stage, opts) {
+      this.stage = stage;
+      this.n = (opts && opts.n) || 3;
+      this.mask = (opts && opts.mask) || null;
+      // przemapowanie kolorów (np. biały na dole dla F2L): colorMap[indeks w modelu] = indeks koloru
+      this.colorMap = (opts && opts.colorMap) || [0, 1, 2, 3, 4, 5];
+      this.view = { rx: -28, ry: -38 };
+      this.state = [];
+      this.els = [];
+      this.size = 200;
+      this.cube = document.createElement('div');
+      this.cube.className = 'c3d-cube';
+      stage.appendChild(this.cube);
+      let drag = null;
+      stage.addEventListener('pointerdown', (e) => {
+        drag = { x: e.clientX, y: e.clientY, rx: this.view.rx, ry: this.view.ry };
+        stage.setPointerCapture(e.pointerId);
+      });
+      stage.addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        this.view.ry = drag.ry + (e.clientX - drag.x) * 0.5;
+        this.view.rx = Math.max(-85, Math.min(85, drag.rx - (e.clientY - drag.y) * 0.5));
+        this.cube.style.transform = `rotateX(${this.view.rx}deg) rotateY(${this.view.ry}deg)`;
+      });
+      const end = () => { drag = null; };
+      stage.addEventListener('pointerup', end);
+      stage.addEventListener('pointercancel', end);
+    }
+
+    // stan = ułożona kostka + ruchy
+    set(moveList) {
+      this.state = Scramble.solvedCube(this.n);
+      moveList.forEach((mv) => { const m = Scramble.parseMove(mv); if (m) Scramble.applyParsed(this.state, this.n, m); });
+      if (this.els.length !== this.state.length) {
+        this.cube.innerHTML = '';
+        this.els = this.state.map(() => {
+          const d = document.createElement('div');
+          d.className = 'st';
+          d.appendChild(document.createElement('i'));
+          this.cube.appendChild(d);
+          return d;
+        });
+      }
+      this.layout();
+    }
+
+    resetView() { this.view = { rx: -28, ry: -38 }; this.render(); }
+
+    layout() {
+      this.size = Math.min(this.stage.clientWidth, this.stage.clientHeight) * 0.52 || 200;
+      this.cube.style.setProperty('--s', this.size / this.n + 'px');
+      this.render();
+    }
+
+    transform(p, anim) {
+      const n = this.n;
+      const h = this.size / (2 * n);
+      let face;
+      if (Math.abs(p.x) === n) face = p.x > 0 ? 'rotateY(90deg)' : 'rotateY(-90deg)';
+      else if (Math.abs(p.y) === n) face = p.y > 0 ? 'rotateX(90deg)' : 'rotateX(-90deg)';
+      else face = p.z > 0 ? '' : 'rotateY(180deg)';
+      return `${anim || ''} translate3d(${p.x * h}px, ${-p.y * h}px, ${p.z * h}px) ${face}`;
+    }
+
+    render() {
+      this.state.forEach((p, i) => {
+        this.els[i].style.transform = this.transform(p);
+        this.els[i].firstChild.style.background = this.mask && this.mask(p) ? '#3d3d44' : Scramble.COLORS[this.colorMap[p.c]];
+      });
+      this.cube.style.transform = `rotateX(${this.view.rx}deg) rotateY(${this.view.ry}deg)`;
+    }
+
+    animate(mv, dur) {
+      return new Promise((resolve) => {
+        const m = Scramble.parseMove(mv);
+        if (!m) { resolve(); return; }
+        const idx = [];
+        this.state.forEach((p, i) => { if (Scramble.inLayer(p, m, this.n)) idx.push(i); });
+        const k = m.turns === 3 ? -1 : m.turns;
+        const [fn, base] = CSS_ROT[m.axis];
+        const total = base * k;
+        const finish = () => { Scramble.applyParsed(this.state, this.n, m); this.render(); resolve(); };
+        if (reduced.matches || dur <= 0) { finish(); return; }
+        const t0 = performance.now();
+        const ms = dur * (Math.abs(k) === 2 ? 1.4 : 1);
+        const frame = (now) => {
+          let t = Math.min(1, (now - t0) / ms);
+          t = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+          const a = `${fn}(${total * t}deg)`;
+          idx.forEach((i) => { this.els[i].style.transform = this.transform(this.state[i], a); });
+          if (t < 1) requestAnimationFrame(frame); else finish();
+        };
+        requestAnimationFrame(frame);
+      });
+    }
+  }
+
   window.Cube3D = {
+    View,
+    describe,
     init,
     open,
     close,

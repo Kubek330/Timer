@@ -344,6 +344,10 @@
   const modalOpen = () => $$('.modal').some((m) => !m.hidden);
 
   document.addEventListener('keydown', (e) => {
+    if (F2L.isOpen()) {
+      if (!e.target.closest('input, select, textarea') && F2L.key(e)) e.preventDefault();
+      return;
+    }
     if (Streak.isOpen()) {
       if (['Space', 'Enter', 'Escape', 'NumpadEnter'].includes(e.code) || e.key === 'Escape') { e.preventDefault(); if (!e.repeat) { Streak.close(); ignoreRelease = e.code === 'Space'; } }
       return;
@@ -771,6 +775,14 @@
   $('#btnNewScramble').addEventListener('click', (e) => { newScramble(); e.currentTarget.blur(); });
   const open3d = (e) => { if (e) e.currentTarget.blur(); Cube3D.open(session().puzzle, scramble); };
   Cube3D.init();
+  F2L.init({
+    data,
+    save,
+    fmt,
+    toast,
+    onTrained: () => { Progress.announce(Progress.check(data)); save(); },
+  });
+  $('#btnF2L').addEventListener('click', () => { closeModals(); F2L.open(); });
   $('#btn3d').addEventListener('click', open3d);
   $('#btn3dCard').addEventListener('click', open3d);
   $('#btnCopy').addEventListener('click', () => copy(scramble.replace(/\n/g, ' ')));
@@ -844,6 +856,7 @@
   // wywoływane przez przycisk "wstecz" w aplikacji; true = obsłużone na stronie
   window.ccBack = () => {
     if (Streak.isOpen()) { Streak.close(); return true; }
+    if (F2L.isOpen()) { F2L.close(); return true; }
     if (Cube3D.isOpen()) { Cube3D.close(); return true; }
     if (modalOpen()) { closeModals(); return true; }
     if (tState !== 'idle') { cancelAll(); return true; }

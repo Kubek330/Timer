@@ -157,6 +157,8 @@
         p[d.axis] = d.sign * n;
         p[others[0]] = a;
         p[others[1]] = b;
+        // element (kostka), do którego należy naklejka w stanie ułożonym
+        p.home = ['x', 'y', 'z'].map((k) => (Math.abs(p[k]) === n ? Math.sign(p[k]) * (n - 1) : p[k]));
         st.push(p);
       }
     }

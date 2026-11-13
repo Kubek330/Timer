@@ -836,3 +836,67 @@ body.in-app .web-only { display: none !important; }
   .streak-ov .so-num .new { transform: none; opacity: 1; }
   .streak-ov .so-num .old { display: none; }
 }
+
+/* ===== Trener F2L ===== */
+.train-card {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; margin-bottom: 14px;
+  border: 1px solid var(--border); border-radius: 14px;
+  background: var(--surface); color: var(--text); text-align: left;
+}
+.train-card:hover { background: var(--surface-2); }
+.train-card svg { flex: none; width: 34px; height: 34px; color: var(--ready); }
+.train-card span { display: flex; flex-direction: column; gap: 2px; }
+.train-card small { color: var(--muted); font-size: 12px; }
+.menu-h { margin: 0 0 6px; font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .6px; }
+
+.f2l-box { max-width: 600px; }
+.f2l-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.f2l-top div { display: flex; flex-direction: column; gap: 2px; }
+.f2l-top b { font-size: 18px; }
+.f2l-top .muted { font-size: 13px; }
+.f2l-next { flex: none; }
+.f2l-note { margin: 6px 0 0; }
+.f2l-stage { height: min(34vh, 260px); }
+.f2l-setup { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.f2l-setup-row { display: flex; gap: 8px; align-items: center; }
+.f2l-setup-row code {
+  flex: 1; min-width: 0;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 9px 12px; font-size: 16px; font-weight: 600; letter-spacing: 1px; word-spacing: 4px;
+  font-family: inherit; overflow-wrap: anywhere;
+}
+.f2l-setup-row .btn { flex: none; height: 40px; }
+.f2l-timer {
+  display: block; width: 100%; margin: 14px 0 2px; padding: 14px 0;
+  border: 1px solid var(--border); border-radius: 16px;
+  background: var(--surface); color: var(--digits);
+  font-family: 'DSEG7', ui-monospace, monospace; font-size: 46px; line-height: 1.1;
+  font-variant-numeric: tabular-nums; cursor: pointer;
+  touch-action: manipulation;
+}
+.f2l-timer.running { color: var(--ready); border-color: var(--ready); }
+.f2l-alg { margin-top: 8px; }
+.f2l-alg > .btn { width: 100%; }
+#f2lAlg { color: var(--ready); }
+.f2l-cstats { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 12px 0 4px; color: var(--muted); font-size: 13px; }
+.f2l-cstats b { color: var(--text); font-variant-numeric: tabular-nums; }
+.f2l-pick { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+.f2l-pick summary { cursor: pointer; font-weight: 600; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.f2l-group { margin-top: 12px; }
+.f2l-ghead { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+.f2l-ghead small { color: var(--muted); font-weight: 400; }
+.f2l-ghead input { width: 18px; height: 18px; accent-color: var(--ready); }
+.f2l-chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 6px; margin-top: 6px; }
+.f2l-chip {
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: 6px 2px; border-radius: 10px;
+  border: 1px solid var(--border); background: transparent; color: var(--muted);
+  font-variant-numeric: tabular-nums; opacity: .55;
+}
+.f2l-chip b { font-size: 15px; color: var(--text-2); }
+.f2l-chip span { font-size: 11px; }
+.f2l-chip.on { opacity: 1; background: var(--surface); border-color: var(--surface-3); }
+.f2l-chip.on b { color: var(--text); }
+.f2l-chip.sp-fast span { color: var(--ready); }
+.f2l-chip.sp-slow span { color: #ff8a3d; }
