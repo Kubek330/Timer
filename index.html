@@ -70,6 +70,10 @@
             <svg viewBox="0 0 24 24"><path d="M5 20V13M12 20V8M19 20V4" stroke-width="3" stroke-linecap="round"/></svg>
             Czasy
           </button>
+          <button class="tab" data-tab="train" role="tab">
+            <svg viewBox="0 0 24 24"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg>
+            Trening
+          </button>
           <button class="icon-btn small collapse-btn" id="btnCollapse" title="Zwiń panel" aria-label="Zwiń panel">
             <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
@@ -100,6 +104,11 @@
             <div class="cube-draw" id="cubeDraw"></div>
             <button class="btn ghost show3d" id="btn3dCard">Pokaż w 3D, jak pomieszać</button>
           </div>
+        </section>
+
+        <section class="tab-page" data-page="train">
+          <p class="muted small train-intro">Ćwicz algorytmy na kostce 3D. Wolniejsze przypadki trener losuje częściej.</p>
+          <div class="tr-list" id="trList"></div>
         </section>
 
         <section class="tab-page" data-page="times">
@@ -194,6 +203,7 @@
           <button data-st="records">Rekordy</button>
           <button data-st="activity">Aktywność</button>
           <button data-st="sessions">Sesje</button>
+          <button data-st="train">Trening</button>
         </div>
         <div class="ins-filters" id="insFilters" hidden>
           <select id="insPuzzle" aria-label="Kostka"></select>
@@ -229,7 +239,7 @@
       <div class="modal-body">
         <button class="train-card" id="btnF2L">
           <svg viewBox="0 0 24 24"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/><path d="M12 16.5l4-2.25v-4.5L12 12z" fill="currentColor" stroke="none" opacity=".85"/></svg>
-          <span><b>Trener F2L</b><small>41 przypadków na kostce 3D, z czasem i algorytmami</small></span>
+          <span><b>Trening: F2L, OLL, PLL</b><small>Przypadki na kostce 3D, z czasem i algorytmami</small></span>
         </button>
         <h3 class="menu-h">Sesje</h3>
         <ul class="session-list" id="sessionList"></ul>
@@ -311,13 +321,17 @@
 
   <div class="modal" id="modalF2L" hidden>
     <div class="modal-box wide f2l-box">
-      <div class="modal-head"><h2>Trener F2L</h2><button class="icon-btn small" data-close-f2l aria-label="Zamknij">✕</button></div>
+      <div class="modal-head"><h2>Trening</h2><button class="icon-btn small" data-close-f2l aria-label="Zamknij">✕</button></div>
       <div class="modal-body">
+        <div class="tab-strip tr-sets" id="trSets" role="tablist"></div>
         <div class="f2l-top">
           <div><b id="f2lCase"></b><span class="muted" id="f2lGroup"></span></div>
-          <button class="btn ghost f2l-next" id="f2lNext">Następny</button>
+          <div class="tr-nav">
+            <button class="btn ghost" id="f2lPrev" title="Poprzedni przypadek" aria-label="Poprzedni przypadek"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="btn ghost f2l-next" id="f2lNext">Następny <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
         </div>
-        <p class="muted small f2l-note">Slot z prawej z przodu. Szare naklejki to ostatnia warstwa, która tu nie ma znaczenia.</p>
+        <p class="muted small f2l-note" id="f2lNote"></p>
         <div class="c3d-stage f2l-stage" id="f2lStage"></div>
         <div class="f2l-setup">
           <span class="muted small">Ustaw na ułożonej kostce (biały na dole, zielony z przodu):</span>
@@ -374,7 +388,7 @@
   <script src="js/scramble.js"></script>
   <script src="js/stats.js"></script>
   <script src="js/cube3d.js"></script>
-  <script src="js/f2l.js"></script>
+  <script src="js/trainer.js"></script>
   <script src="js/icons.js"></script>
   <script src="js/progress.js"></script>
   <script src="js/streak.js"></script>

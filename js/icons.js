@@ -34,6 +34,9 @@
     run: () => '<circle cx="14.5" cy="4.5" r="1.8"/><path d="M8 21l2.5-5.5 3 2.5V22M6 11.5l3-3.5 4.5.8 2.5 3.7 3 .5M10.5 15.5l2.5-6.7"/>',
     // para F2L: narożnik i krawędź łączące się w slot
     pair: (n) => `<rect x="4" y="9" width="7" height="7" rx="1.4"/><rect x="13" y="9" width="7" height="7" rx="1.4"/><path d="M11 12.5h2" stroke-width="2.4"/>${n ? num(n, 6.8, 6.5) : ''}`,
+    // OLL: żółta góra 3x3 z krzyżem; PLL: góra ze strzałkami zamiany
+    oll: () => '<rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M9.2 3.5v17M14.8 3.5v17M3.5 9.2h17M3.5 14.8h17" stroke-width="1.1" opacity=".5"/><path d="M9.2 9.2h5.6v5.6H9.2zM11 3.5h2v5.7h-2zM11 14.8h2v5.7h-2zM3.5 11h5.7v2H3.5zM14.8 11h5.7v2h-5.7z" fill="currentColor" stroke="none"/>',
+    pll: () => '<rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M8 16.5 16 7.5M16 7.5h-3.6M16 7.5v3.6M8 16.5h3.6M8 16.5v-3.6" stroke-width="1.6"/>',
     trophy: () => '<path d="M8 4h8v6a4 4 0 0 1-8 0zM8 6H5v1.5A3.5 3.5 0 0 0 8.5 11M16 6h3v1.5a3.5 3.5 0 0 1-3.5 3.5M12 14v3M8.5 20h7l-.8-3h-5.4z"/>',
   };
 

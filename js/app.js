@@ -344,8 +344,8 @@
   const modalOpen = () => $$('.modal').some((m) => !m.hidden);
 
   document.addEventListener('keydown', (e) => {
-    if (F2L.isOpen()) {
-      if (!e.target.closest('input, select, textarea') && F2L.key(e)) e.preventDefault();
+    if (Trainer.isOpen()) {
+      if (!e.target.closest('input, select, textarea') && Trainer.key(e)) e.preventDefault();
       return;
     }
     if (Streak.isOpen()) {
@@ -589,6 +589,7 @@
     $$('#insRange button').forEach((b) => b.classList.toggle('on', b.dataset.r === ins.range));
     $('#insPuzzle').value = ins.puzzle;
     if (isSession) renderStatsModal();
+    else if (ins.tab === 'train') Trainer.renderStats($('#insightPane'));
     else Insights.render($('#insightPane'), data, ins, fmt);
   }
   $('#statsTabs').addEventListener('click', (e) => {
@@ -775,14 +776,22 @@
   $('#btnNewScramble').addEventListener('click', (e) => { newScramble(); e.currentTarget.blur(); });
   const open3d = (e) => { if (e) e.currentTarget.blur(); Cube3D.open(session().puzzle, scramble); };
   Cube3D.init();
-  F2L.init({
+  const renderTrainList = () => Trainer.renderList($('#trList'));
+  Trainer.init({
     data,
     save,
     fmt,
     toast,
-    onTrained: () => { Progress.announce(Progress.check(data)); save(); },
+    onTrained: () => { Progress.announce(Progress.check(data)); save(); renderTrainList(); },
+    onClose: renderTrainList,
   });
-  $('#btnF2L').addEventListener('click', () => { closeModals(); F2L.open(); });
+  renderTrainList();
+  $('#btnF2L').addEventListener('click', () => { closeModals(); Trainer.open(); });
+  $('#trList').addEventListener('click', (e) => { const b = e.target.closest('[data-set]'); if (b) Trainer.open(b.dataset.set); });
+  $('#insightPane').addEventListener('click', (e) => {
+    const b = e.target.closest('.tr-open');
+    if (b) { closeModals(); Trainer.open(b.dataset.set); }
+  });
   $('#btn3d').addEventListener('click', open3d);
   $('#btn3dCard').addEventListener('click', open3d);
   $('#btnCopy').addEventListener('click', () => copy(scramble.replace(/\n/g, ' ')));
@@ -856,7 +865,7 @@
   // wywoływane przez przycisk "wstecz" w aplikacji; true = obsłużone na stronie
   window.ccBack = () => {
     if (Streak.isOpen()) { Streak.close(); return true; }
-    if (F2L.isOpen()) { F2L.close(); return true; }
+    if (Trainer.isOpen()) { Trainer.close(); return true; }
     if (Cube3D.isOpen()) { Cube3D.close(); return true; }
     if (modalOpen()) { closeModals(); return true; }
     if (tState !== 'idle') { cancelAll(); return true; }

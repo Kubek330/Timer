@@ -54,7 +54,9 @@
       streak: streak(perDay),
       maxStreak: maxStreak(perDay),
       flags: data.flags || {},
-      f2l: Object.keys((data.f2l && data.f2l.stats) || {}).length,
+      f2l: window.Trainer ? Trainer.trained(data, 'f2l') : 0,
+      oll: window.Trainer ? Trainer.trained(data, 'oll') : 0,
+      pll: window.Trainer ? Trainer.trained(data, 'pll') : 0,
     };
   }
 
@@ -118,6 +120,8 @@
     // inne
     { id: 'f2l1', ic: ['pair', ''], cat: 'other', name: 'Pierwsza para', desc: 'Przećwicz przypadek w trenerze F2L.', test: (c) => cnt(c.f2l, 1) },
     { id: 'f2l41', ic: ['pair', '41'], cat: 'other', name: 'Mistrz F2L', desc: 'Przećwicz wszystkie 41 przypadków F2L.', test: (c) => cnt(c.f2l, 41) },
+    { id: 'oll10', ic: ['oll', ''], cat: 'other', name: 'Żółta góra', desc: 'Przećwicz wszystkie 10 algorytmów 2-look OLL.', test: (c) => cnt(c.oll, 10) },
+    { id: 'pll21', ic: ['pll', ''], cat: 'other', name: 'Mistrz PLL', desc: 'Przećwicz wszystkie 21 PLL.', test: (c) => cnt(c.pll, 21) },
     { id: 'insp10', ic: ['eye', ''], cat: 'other', name: 'Jak na zawodach', desc: '10 ułożeń z inspekcją 15 s.', test: (c) => cnt(c.inspected, 10) },
     { id: 'guide', ic: ['compass', ''], cat: 'other', name: 'Mistrz mieszania', desc: 'Przejdź cały scramble w podglądzie 3D.', test: (c) => !!c.flags.guide },
     { id: 'night', ic: ['moon', ''], cat: 'other', name: 'Nocny marek', desc: 'Ułóż kostkę między północą a 4:00.', test: (c) => c.night },

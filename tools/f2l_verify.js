@@ -4,8 +4,8 @@ const S = window.Scramble;
 // uruchomienie: node tools/f2l_verify.js
 window.Cube3D = {};
 global.document = { querySelector: () => null };
-require(require('path').join(__dirname, '..', 'js', 'f2l.js'));
-const CASES = window.F2L.CASES.map((c) => [c.group, c.alg]);
+require(require('path').join(__dirname, '..', 'js', 'trainer.js'));
+const CASES = window.Trainer.SETS.f2l.cases.map((c) => [c.group, c.alg]);
 const inv = (m) => m.endsWith("'") ? m[0] : m.endsWith('2') ? m : m + "'";
 const apply = (st, seq) => seq.forEach((mv) => S.applyParsed(st, 3, S.parseMove(mv)));
 const key = (p) => p.x + ',' + p.y + ',' + p.z;

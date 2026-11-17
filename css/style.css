@@ -852,7 +852,7 @@ body.in-app .web-only { display: none !important; }
 
 .f2l-box { max-width: 600px; }
 .f2l-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.f2l-top div { display: flex; flex-direction: column; gap: 2px; }
+.f2l-top > div:first-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .f2l-top b { font-size: 18px; }
 .f2l-top .muted { font-size: 13px; }
 .f2l-next { flex: none; }
@@ -900,3 +900,35 @@ body.in-app .web-only { display: none !important; }
 .f2l-chip.on b { color: var(--text); }
 .f2l-chip.sp-fast span { color: var(--ready); }
 .f2l-chip.sp-slow span { color: #ff8a3d; }
+
+/* ===== Trening: zestawy, nawigacja, karty ===== */
+.tr-sets { margin-bottom: 10px; }
+.tr-nav { display: flex; flex-direction: row; gap: 6px; flex: none; }
+.tr-nav .btn { height: 38px; padding: 0 12px; gap: 4px; }
+.tr-nav .btn svg { width: 16px; height: 16px; }
+.tr-nav .btn:disabled { opacity: .35; cursor: default; }
+#f2lAlg .auf { color: var(--muted); font-weight: 500; margin-left: 4px; }
+.train-intro { margin: 4px 4px 10px; }
+.tr-list { display: flex; flex-direction: column; gap: 8px; }
+.tr-card {
+  display: flex; gap: 12px; align-items: center; text-align: left;
+  padding: 12px; border-radius: 14px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+}
+.tr-card:hover { background: var(--surface-2); }
+.tr-ico { flex: none; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--surface-2); color: var(--ready); }
+.tr-svg { width: 26px; height: 26px; }
+.tr-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.tr-txt small { color: var(--muted); font-size: 12px; }
+.tr-txt .ach-bar { margin: 6px 0 2px; }
+.tr-stat { margin-bottom: 18px; }
+.tr-stat .ins-h { margin-top: 4px; font-size: 16px; color: var(--text); }
+.tr-slow { list-style: none; margin: 4px 0 10px; padding: 0; }
+.tr-slow li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.tr-slow b { font-variant-numeric: tabular-nums; }
+.tr-open { width: 100%; }
+.tabs .tab { padding: 0 6px; }
+@media (max-width: 760px) {
+  .tr-nav .btn { padding: 0 10px; }
+  .f2l-top b { font-size: 16px; }
+}

@@ -174,18 +174,47 @@
   }
 
   // rozkłada ruch (np. "3Rw'") na: oś, stronę, szerokość i liczbę obrotów CW wokół dodatniej osi
+  // ruchy wewnętrznych warstw i obroty całej kostki (używane w algorytmach OLL/PLL)
+  const SLICE_DEF = { M: 'L', E: 'D', S: 'F' };   // warstwa środkowa obraca się jak ta ściana
+  const ROT_DEF = { x: 'R', y: 'U', z: 'F' };     // obrót całej kostki jak ta ściana
+
   function parseMove(mv) {
-    const m = /^(\d*)([URFDLB])(w?)(['2]?)$/.exec(mv);
-    if (!m) return null;
-    const face = FACE_DEF[m[2]];
-    const width = m[3] ? (m[1] ? parseInt(m[1], 10) : 2) : 1;
-    // obrót CW ściany o znaku -1 to obrót CCW wokół dodatniej osi
-    let turns = m[4] === '2' ? 2 : (m[4] === "'" ? 3 : 1);
-    if (face.sign < 0) turns = (4 - turns) % 4;
-    return { face: m[2], axis: face.axis, sign: face.sign, width, turns, suffix: m[4] };
+    const turnsOf = (suf, sign) => {
+      let t = suf === '2' ? 2 : (suf === "'" ? 3 : 1);
+      if (sign < 0) t = (4 - t) % 4;
+      return t;
+    };
+    let m = /^(\d*)([URFDLB])(w?)(['2]?)$/.exec(mv);
+    if (m) {
+      const face = FACE_DEF[m[2]];
+      const width = m[3] ? (m[1] ? parseInt(m[1], 10) : 2) : 1;
+      // obrót CW ściany o znaku -1 to obrót CCW wokół dodatniej osi
+      return { kind: 'face', face: m[2], axis: face.axis, sign: face.sign, width, turns: turnsOf(m[4], face.sign), suffix: m[4] };
+    }
+    m = /^([urfdlb])(['2]?)$/.exec(mv); // mała litera = dwie warstwy (jak Rw)
+    if (m) {
+      const F = m[1].toUpperCase();
+      const face = FACE_DEF[F];
+      return { kind: 'face', face: F, axis: face.axis, sign: face.sign, width: 2, turns: turnsOf(m[2], face.sign), suffix: m[2] };
+    }
+    m = /^([MES])(['2]?)$/.exec(mv);
+    if (m) {
+      const face = FACE_DEF[SLICE_DEF[m[1]]];
+      return { kind: 'slice', face: m[1], axis: face.axis, sign: face.sign, width: 1, turns: turnsOf(m[2], face.sign), suffix: m[2] };
+    }
+    m = /^([xyz])(['2]?)$/.exec(mv);
+    if (m) {
+      const face = FACE_DEF[ROT_DEF[m[1]]];
+      return { kind: 'rot', face: m[1], axis: face.axis, sign: face.sign, width: 0, turns: turnsOf(m[2], face.sign), suffix: m[2] };
+    }
+    return null;
   }
 
-  const inLayer = (p, mv, n) => p[mv.axis] * mv.sign > n - 2 * mv.width;
+  const inLayer = (p, mv, n) => {
+    if (mv.kind === 'rot') return true;
+    if (mv.kind === 'slice') return Math.abs(p[mv.axis]) < n - 1; // wszystkie warstwy między zewnętrznymi
+    return p[mv.axis] * mv.sign > n - 2 * mv.width;
+  };
 
   function applyParsed(st, n, mv) {
     for (const p of st) {
