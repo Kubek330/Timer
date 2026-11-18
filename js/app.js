@@ -52,12 +52,19 @@
   /* ================= Pomocnicze ================= */
   const { fmt, fmtSolve } = window.Stats;
   let toastTimer;
-  function toast(msg) {
+  function toast(msg, action) {
     const t = $('#toast');
     t.textContent = msg;
+    if (action) {
+      const b = document.createElement('button');
+      b.className = 'toast-act';
+      b.textContent = action.label;
+      b.addEventListener('click', () => { t.hidden = true; action.run(); });
+      t.appendChild(b);
+    }
     t.hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.hidden = true; }, 1800);
+    toastTimer = setTimeout(() => { t.hidden = true; }, action ? 6000 : 1800);
   }
   async function copy(text) {
     try { await navigator.clipboard.writeText(text); toast('Skopiowano'); }
@@ -155,7 +162,7 @@
       running: '',
       'arm-insp': '',
     };
-    hint.textContent = map[tState] || '';
+    hint.textContent = S.manual ? 'Wpisz czas z innego timera i naciśnij Dodaj' : (map[tState] || '');
   }
   function setState(s) {
     tState = s;
@@ -260,7 +267,8 @@
     const before = Progress.compute(data);
     const firstToday = !before.perDay[Progress.dayKey(Date.now())];
     const solve = { id: uid(), time, penalty: pen || 0, scramble, date: Date.now(), puzzle: s.puzzle };
-    if (S.inspection) solve.insp = true;
+    if (S.inspection && !S.manual) solve.insp = true;
+    if (S.manual) solve.manual = true;
     s.solves.push(solve);
     lastSolveId = solve.id;
     pendingPen = 0;
@@ -320,7 +328,119 @@
   }
 
   // wejście: naciśnięcie / puszczenie
+  /* ================= Usuwanie czasów (z cofaniem) ================= */
+  function removeSolves(ids) {
+    const s = session();
+    const set = new Set(ids);
+    const removed = [];
+    s.solves.forEach((x, i) => { if (set.has(x.id)) removed.push({ x, i }); });
+    if (!removed.length) return;
+    s.solves = s.solves.filter((x) => !set.has(x.id));
+    if (set.has(lastSolveId)) { lastSolveId = null; setDigits('0.00'); $('#lastActions').hidden = true; }
+    save();
+    renderStats();
+    Streak.updateChip(Progress.compute(data));
+    syncNative();
+    const sessId = s.id;
+    toast(removed.length === 1 ? 'Usunięto czas' : `Usunięto czasy: ${removed.length}`, {
+      label: 'Cofnij',
+      run: () => {
+        const target = data.sessions.find((x) => x.id === sessId);
+        if (!target) return;
+        removed.forEach(({ x, i }) => target.solves.splice(Math.min(i, target.solves.length), 0, x));
+        save();
+        renderStats();
+        Streak.updateChip(Progress.compute(data));
+        syncNative();
+        toast('Przywrócono');
+      },
+    });
+  }
+
+  // tryb zaznaczania na liście czasów
+  const picked = new Set();
+  let picking = false;
+  function setPicking(on) {
+    picking = on;
+    picked.clear();
+    $('#timesTools').hidden = on;
+    $('#timesBulk').hidden = !on;
+    document.querySelector('[data-page="times"]').classList.toggle('picking', on);
+    renderStats();
+  }
+  function updatePicked() {
+    $('#timesCount').textContent = `${picked.size} zaznaczonych`;
+    $('#timesDelete').disabled = picked.size === 0;
+    $$('#timesList li').forEach((li) => li.classList.toggle('sel', picked.has(li.dataset.id)));
+  }
+  $('#timesSelect').addEventListener('click', () => setPicking(true));
+  $('#timesCancel').addEventListener('click', () => setPicking(false));
+  $('#timesAll').addEventListener('click', () => {
+    const all = session().solves.map((x) => x.id);
+    if (picked.size === all.length) picked.clear(); else all.forEach((id) => picked.add(id));
+    updatePicked();
+  });
+  $('#timesDelete').addEventListener('click', () => {
+    const ids = Array.from(picked);
+    setPicking(false);
+    removeSolves(ids);
+  });
+  $('#timesClear').addEventListener('click', async () => {
+    const n = session().solves.length;
+    if (!n) { toast('Ta sesja nie ma czasów'); return; }
+    const yes = await ask({ title: 'Usunąć wszystkie czasy?', msg: `Z sesji „${session().name}” zniknie ${n} czasów. Zaraz po usunięciu można to jeszcze cofnąć.`, ok: 'Usuń wszystkie', danger: true });
+    if (yes) removeSolves(session().solves.map((x) => x.id));
+  });
+
+  /* ================= Ręczne wpisywanie czasów ================= */
+  // 1234 -> 12.34, 10523 -> 1:05.23, "12.34", "1:05.23", "12,34"
+  function parseManual(str) {
+    const t = String(str).trim().replace(',', '.');
+    if (!t) return null;
+    let ms = null;
+    if (/^\d+$/.test(t)) {
+      const d = parseInt(t, 10);
+      const cs = d % 100;
+      const rest = Math.floor(d / 100);
+      const sec = rest % 100;
+      const min = Math.floor(rest / 100);
+      if (min > 0 && sec >= 60) return null;
+      ms = (min * 60 + sec) * 1000 + cs * 10;
+      if (min === 0) ms = rest * 1000 + cs * 10; // np. 6543 = 65.43
+    } else if (/^\d+:\d{1,2}(\.\d{1,3})?$/.test(t)) {
+      const [m, s] = t.split(':');
+      if (parseFloat(s) >= 60) return null;
+      ms = Math.round((parseInt(m, 10) * 60 + parseFloat(s)) * 1000);
+    } else if (/^\d*\.\d{1,3}$/.test(t) || /^\d+$/.test(t)) {
+      ms = Math.round(parseFloat(t) * 1000);
+    } else return null;
+    return ms > 0 && ms < 24 * 3600 * 1000 ? ms : null;
+  }
+  let manualPen = 0;
+  function applyManual() {
+    document.body.classList.toggle('manual', !!S.manual);
+    $('#manualForm').hidden = !S.manual;
+    setHint();
+  }
+  $$('#manualForm [data-mpen]').forEach((b) => b.addEventListener('click', () => {
+    manualPen = b.dataset.mpen === 'DNF' ? 'DNF' : Number(b.dataset.mpen);
+    $$('#manualForm [data-mpen]').forEach((x) => x.classList.toggle('on', x === b));
+    $('#manualTime').focus();
+  }));
+  $('#manualForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const inp = $('#manualTime');
+    const ms = parseManual(inp.value);
+    if (ms === null) { toast('Nie rozumiem tego czasu. Wpisz np. 1234, 12.34 albo 1:05.23'); inp.focus(); return; }
+    addSolve(ms, manualPen);
+    inp.value = '';
+    manualPen = 0;
+    $$('#manualForm [data-mpen]').forEach((x) => x.classList.toggle('on', x.dataset.mpen === '0'));
+    if (!MOBILE.matches) inp.focus();
+  });
+
   function press() {
+    if (S.manual) return; // czasy wpisywane ręcznie
     if (tState === 'running') { stopRun(); ignoreRelease = true; return; }
     if (tState === 'idle') {
       if (S.inspection) { setState('arm-insp'); return; }
@@ -410,9 +530,8 @@
     const i = s.solves.findIndex((x) => x.id === id);
     if (i < 0) return;
     if (pen === 'del') {
-      s.solves.splice(i, 1);
-      if (id === lastSolveId) { lastSolveId = null; setDigits('0.00'); $('#lastActions').hidden = true; }
-      toast('Usunięto czas');
+      removeSolves([id]);
+      return;
     } else {
       s.solves[i].penalty = pen === 'DNF' ? 'DNF' : Number(pen);
       if (id === lastSolveId) showLast();
@@ -452,7 +571,7 @@
     for (let i = sv.length - 1; i >= Math.max(0, sv.length - LIMIT); i--) {
       const x = sv[i];
       const isBest = best !== null && best !== Infinity && st.value(x) === best;
-      html += `<li data-id="${x.id}"><span class="idx">${i + 1}</span><span class="t${isBest ? ' best' : ''}">${esc(fmtSolve(x))}</span><span>${fmt(st.avgAt(sv, i, 5))}</span><span>${fmt(st.avgAt(sv, i, 12))}</span></li>`;
+      html += `<li data-id="${x.id}" class="${picking && picked.has(x.id) ? 'sel' : ''}"><span class="idx">${i + 1}</span><span class="t${isBest ? ' best' : ''}">${esc(fmtSolve(x))}</span><span>${fmt(st.avgAt(sv, i, 5))}</span><span>${fmt(st.avgAt(sv, i, 12))}</span></li>`;
     }
     list.innerHTML = html;
     $('#timesEmpty').hidden = sv.length > 0;
@@ -461,7 +580,14 @@
 
   $('#timesList').addEventListener('click', (e) => {
     const li = e.target.closest('li');
-    if (li) openSolve(li.dataset.id);
+    if (!li) return;
+    if (picking) {
+      const id = li.dataset.id;
+      if (picked.has(id)) picked.delete(id); else picked.add(id);
+      updatePicked();
+      return;
+    }
+    openSolve(li.dataset.id);
   });
 
   /* ================= Okna ================= */
@@ -756,6 +882,7 @@
   $('#setRunMode').addEventListener('change', (e) => { S.runMode = e.target.value; save(); e.target.blur(); });
   bindCheck('#setFocus', 'focus', () => document.body.classList.toggle('focus', S.focus));
   bindCheck('#setDraw', 'draw', renderScramble);
+  bindCheck('#setManual', 'manual', () => { cancelAll(); applyManual(); });
   bindCheck('#setCelebrate', 'celebrate');
   bindCheck('#setStreakAnim', 'streakAnim');
   $('#setHold').value = String(S.hold);
@@ -942,6 +1069,7 @@
   renderStats();
   syncNative();
   applyReminder();
+  applyManual();
   Streak.init();
   Streak.updateChip(Progress.compute(data));
   // licznik passy: podgląd tygodnia

@@ -23,13 +23,22 @@
   function describe(mv) {
     const m = Scramble.parseMove(mv);
     if (!m) return '';
+    const how2 = m.suffix === '2' ? 'o pół obrotu (2 razy)' : m.suffix === "'" ? 'w drugą stronę' : '';
+    if (m.kind === 'slice') {
+      const like = { M: 'jak ścianę lewą (L)', E: 'jak ścianę dolną (D)', S: 'jak ścianę przednią (F)' }[m.face];
+      return `Obróć środkową warstwę ${like}${how2 ? ', ' + how2 : ''}`;
+    }
+    if (m.kind === 'rot') {
+      const like = { x: 'jak ruch R (do góry przodem)', y: 'jak ruch U (w lewo przodem)', z: 'jak ruch F' }[m.face];
+      return `Obróć całą kostkę w dłoniach ${like}${how2 ? ', ' + how2 : ''}`;
+    }
     const who = m.width === 1
       ? `${FACE_NAME[m.face]} ścianę`
       : `${LAYERS[m.width] || m.width} zewnętrzne warstwy od strony ${{ U: 'górnej', D: 'dolnej', R: 'prawej', L: 'lewej', F: 'przedniej', B: 'tylnej' }[m.face]}`;
     const how = m.suffix === '2' ? 'o pół obrotu (2 razy)'
       : m.suffix === "'" ? 'przeciwnie do ruchu wskazówek zegara'
         : 'zgodnie z ruchem wskazówek zegara';
-    return `Obróć ${who} ${how}`;
+    return `Obróć ${who} ${how}${m.suffix === '2' ? '' : ' (patrząc na nią)'}`;
   }
 
   // ustawienie naklejki: obrót animacji + przesunięcie na miejsce + skierowanie na zewnątrz

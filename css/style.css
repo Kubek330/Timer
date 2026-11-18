@@ -932,3 +932,57 @@ body.in-app .web-only { display: none !important; }
   .tr-nav .btn { padding: 0 10px; }
   .f2l-top b { font-size: 16px; }
 }
+
+/* ===== Usuwanie wielu czasów ===== */
+.times-tools, .times-bulk { display: flex; align-items: center; gap: 10px; padding: 4px 10px 8px; flex-wrap: wrap; }
+.times-tools { justify-content: space-between; }
+.times-bulk .btn { height: 34px; padding: 0 12px; }
+.times-bulk #timesCount { flex: 1; }
+.danger-link { color: var(--hold); }
+.btn:disabled { opacity: .4; cursor: default; }
+.picking .times-list li { position: relative; padding-left: 34px; }
+.picking .times-list li::before {
+  content: ''; position: absolute; left: 10px; top: 50%; width: 16px; height: 16px; margin-top: -8px;
+  border: 2px solid var(--surface-3); border-radius: 5px;
+}
+.picking .times-list li.sel { background: color-mix(in srgb, var(--hold) 14%, transparent); }
+.picking .times-list li.sel::before { background: var(--hold); border-color: var(--hold); }
+.toast { display: flex; align-items: center; gap: 14px; }
+.toast-act { border: 0; background: transparent; color: var(--ready); font-weight: 700; font-size: 14px; padding: 4px 2px; }
+
+/* ===== Ręczne wpisywanie czasu ===== */
+.manual { width: min(420px, 100%); display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+.manual-row { display: flex; gap: 8px; }
+.manual-row input {
+  flex: 1; min-width: 0; height: 48px; padding: 0 14px;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 12px; font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.manual-row input:focus { outline: 2px solid var(--ready); outline-offset: 1px; }
+.manual-row .btn { height: 48px; }
+.manual-pen { display: flex; gap: 8px; }
+.manual-pen button { flex: 1; height: 36px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-2); font-weight: 600; }
+.manual-pen button.on { background: var(--surface-3); color: var(--text); }
+.manual p { margin: 0; text-align: center; }
+body.manual .timer-zone { touch-action: auto; }
+
+/* ===== Algorytm ruch po ruchu ===== */
+.tr-alg { display: flex; flex-direction: column; gap: 8px; }
+.mv-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.mv-chips .mv {
+  min-width: 34px; padding: 5px 8px; text-align: center;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
+  font-weight: 700; font-size: 15px; color: var(--ready);
+}
+.mv-chips .mv.done { color: var(--muted); background: transparent; }
+.mv-chips .mv.now { background: var(--ready); border-color: var(--ready); color: #08140c; transform: scale(1.08); }
+.mv-chips .mv.auf { border-style: dashed; }
+.tr-desc { margin: 0; min-height: 2.6em; color: var(--text-2); font-size: 14px; line-height: 1.35; }
+.tr-play { display: flex; gap: 8px; }
+.tr-play .btn { height: 42px; gap: 4px; }
+.tr-play #f2lStep { flex: 1; }
+.tr-play #f2lPlay { flex: 1; }
+.tr-play svg { width: 16px; height: 16px; }
+.tr-speed { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--text-2); font-size: 13px; }
+.tr-speed select { background: var(--surface-2); border: 0; border-radius: 8px; padding: 6px 8px; color: var(--text); }

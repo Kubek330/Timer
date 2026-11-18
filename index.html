@@ -112,6 +112,16 @@
         </section>
 
         <section class="tab-page" data-page="times">
+          <div class="times-tools" id="timesTools">
+            <button class="link-btn" id="timesSelect">Zaznacz kilka</button>
+            <button class="link-btn danger-link" id="timesClear">Usuń wszystkie z sesji</button>
+          </div>
+          <div class="times-bulk" id="timesBulk" hidden>
+            <button class="link-btn" id="timesAll">Zaznacz wszystkie</button>
+            <span class="muted small" id="timesCount">0 zaznaczonych</span>
+            <button class="btn danger" id="timesDelete" disabled>Usuń</button>
+            <button class="btn ghost" id="timesCancel">Gotowe</button>
+          </div>
           <div class="times-head">
             <span>#</span><span>czas</span><span>ao5</span><span>ao12</span>
           </div>
@@ -141,6 +151,18 @@
       <div class="timer-zone" id="timerZone">
         <div class="time-display" id="timeDisplay"><span class="digits">0.00</span></div>
         <div class="timer-hint" id="timerHint">Przytrzymaj spację</div>
+        <form class="manual" id="manualForm" hidden autocomplete="off">
+          <div class="manual-row">
+            <input id="manualTime" inputmode="decimal" enterkeyhint="done" placeholder="np. 1234 lub 12.34" aria-label="Czas z innego timera">
+            <button class="btn" type="submit">Dodaj</button>
+          </div>
+          <div class="manual-pen" role="group" aria-label="Kara">
+            <button type="button" data-mpen="0" class="on">OK</button>
+            <button type="button" data-mpen="2">+2</button>
+            <button type="button" data-mpen="DNF">DNF</button>
+          </div>
+          <p class="muted small">Same cyfry: 1234 = 12.34, 10523 = 1:05.23. Można też wpisać 12.34 albo 1:05.23.</p>
+        </form>
         <div class="last-actions" id="lastActions" hidden>
           <button data-pen="0">OK</button>
           <button data-pen="2">+2</button>
@@ -175,6 +197,7 @@
           </select>
         </label>
         <label class="opt"><span>Ukrywaj resztę ekranu podczas ułożenia</span><input type="checkbox" id="setFocus"></label>
+        <label class="opt"><span>Wpisywanie czasów ręcznie (np. z timera Stackmat)</span><input type="checkbox" id="setManual"></label>
         <label class="opt"><span>Podgląd kostki</span><input type="checkbox" id="setDraw"></label>
         <label class="opt"><span>Animacja nowego rekordu</span><input type="checkbox" id="setCelebrate"></label>
         <label class="opt"><span>Animacja passy (pierwsze ułożenie dnia)</span><input type="checkbox" id="setStreakAnim"></label>
@@ -341,7 +364,23 @@
         <p class="muted small center" id="f2lHint"></p>
         <div class="f2l-alg">
           <button class="btn ghost" id="f2lReveal">Pokaż algorytm</button>
-          <div class="f2l-setup-row" id="f2lAlgRow" hidden><code id="f2lAlg"></code><button class="btn ghost" id="f2lPlay">Animuj</button></div>
+          <div class="tr-alg" id="f2lAlgRow" hidden>
+            <div class="mv-chips" id="f2lAlg"></div>
+            <p class="tr-desc" id="f2lMoveDesc">Naciśnij „Krok”, żeby przejść algorytm ruch po ruchu.</p>
+            <div class="tr-play">
+              <button class="btn ghost" id="f2lStepBack" title="Ruch wstecz" aria-label="Ruch wstecz"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="btn" id="f2lStep">Krok <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="btn ghost" id="f2lPlay">Odtwórz całość</button>
+            </div>
+            <label class="tr-speed">Tempo animacji
+              <select id="trSpeed">
+                <option value="1300">bardzo wolno</option>
+                <option value="800">wolno</option>
+                <option value="420">normalnie</option>
+                <option value="230">szybko</option>
+              </select>
+            </label>
+          </div>
         </div>
         <div class="f2l-cstats" id="f2lCaseStats"></div>
         <details class="f2l-pick">

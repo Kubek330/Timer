@@ -11,12 +11,14 @@ Timer do kostki Rubika działający w przeglądarce, na komputerze i na telefoni
 - Kostka 3D „Jak pomieszać”: animacja scramble'a ruch po ruchu z opisem każdego ruchu (2x2–7x7)
 - Statystyki: najlepszy czas, średnia, mo3, ao5, ao12, ao50, ao100, ao1000 i wykres
 - Kary +2 i DNF, usuwanie czasów, szczegóły każdego ułożenia
-- Trening (zakładka w panelu): 2-look OLL (10 algorytmów) i PLL (21) z losowym obrotem góry, przycisk „Poprzedni”, podsumowanie w statystykach
+- Trening (zakładka w panelu): 2-look OLL (10 algorytmów) i PLL (21); algorytm krok po kroku z opisem ruchów i regulowanym tempem animacji z losowym obrotem góry, przycisk „Poprzedni”, podsumowanie w statystykach
 - Trener F2L: 41 przypadków na kostce 3D (biały na dole), ruchy do ustawienia, czas, algorytm z animacją, częstsze losowanie wolniejszych przypadków
 - Osiągnięcia (34 odznaki), seria dni z rzędu i animacja nowego rekordu (pojedynczy, ao5, ao12)
 - Zaawansowane statystyki: historia dni, rozkład czasów, rekordy z datami, kalendarz aktywności, porównanie sesji
 - Passa (dni z rzędu) jak w aplikacjach do nauki języków: licznik na pasku i animacja płomienia po pierwszym ułożeniu dnia
 - Codzienne przypomnienie o treningu w aplikacji na Androida (różne teksty o passie, wieczorne „ostatnia szansa”; nie przychodzi, jeśli tego dnia już układałeś)
+- Ręczne wpisywanie czasów (np. z timera Stackmat): 1234 = 12.34, 10523 = 1:05.23, z karą +2/DNF
+- Usuwanie wielu czasów naraz i całej sesji, z możliwością cofnięcia
 - Sesje: tworzenie, zmiana nazwy, usuwanie, eksport i import do pliku JSON
 - 6 motywów kolorystycznych, tryb pełnoekranowy, tryb skupienia
 - Na telefonie dolny panel, który można schować lub wysunąć (stuknięcie albo przeciągnięcie)

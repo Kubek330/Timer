@@ -162,8 +162,8 @@
     $('#f2lGroup').textContent = s.groups[it.c.group];
     $('#f2lNote').textContent = s.note;
     $('#f2lSetup').textContent = setupMoves(it).join(' ');
-    const fin = finishMove(it);
-    $('#f2lAlg').innerHTML = `${it.c.alg}${fin ? ` <span class="auf">+ ${fin}</span>` : ''}`;
+    step = { list: algMoves(it), idx: 0 };
+    renderMoves();
     $('#f2lAlgRow').hidden = true;
     $('#f2lReveal').hidden = false;
     $('#f2lPrev').disabled = history.length === 0;
@@ -229,24 +229,66 @@
     $('#f2lReveal').hidden = true;
   }
 
-  async function playMoves(list, from) {
+  // tempo animacji (ms na ruch), zapamiętane między uruchomieniami
+  const speed = () => Number((app.data.trainers && app.data.trainers.speed) || 800);
+
+  async function playMoves(list, from, onStep) {
     if (busy) return;
     busy = true;
     view.set(from);
-    for (const mv of list) {
+    for (let i = 0; i < list.length; i++) {
+      if (onStep) onStep(i);
       // eslint-disable-next-line no-await-in-loop
-      await view.animate(mv, 360);
+      await view.animate(list[i], speed());
       // eslint-disable-next-line no-await-in-loop
-      await new Promise((r) => setTimeout(r, 80));
+      await new Promise((r) => setTimeout(r, speed() * 0.45));
     }
     busy = false;
   }
 
+  /* ---------- algorytm ruch po ruchu ---------- */
+  let step = { list: [], idx: 0 };
+  const algMoves = (it) => it.c.alg.split(' ').concat(finishMove(it) ? [finishMove(it)] : []);
+
+  function renderMoves(active) {
+    const fin = finishMove(cur);
+    $('#f2lAlg').innerHTML = step.list.map((m, i) => {
+      const cls = ['mv', i < step.idx ? 'done' : '', i === active ? 'now' : '', fin && i === step.list.length - 1 ? 'auf' : ''].join(' ');
+      return `<span class="${cls}">${m}</span>`;
+    }).join('');
+    const shown = active !== undefined ? active : step.idx - 1;
+    $('#f2lMoveDesc').textContent = shown >= 0 && step.list[shown]
+      ? `${shown + 1}/${step.list.length}: ${Cube3D.describe(step.list[shown])}${fin && shown === step.list.length - 1 ? ' (na koniec obróć górę)' : ''}`
+      : 'Naciśnij „Krok”, żeby przejść algorytm ruch po ruchu.';
+    $('#f2lStepBack').disabled = step.idx === 0;
+    $('#f2lStep').disabled = step.idx >= step.list.length;
+  }
+
+  async function stepForward() {
+    if (busy || step.idx >= step.list.length) return;
+    busy = true;
+    const i = step.idx;
+    renderMoves(i);
+    await view.animate(step.list[i], speed());
+    step.idx++;
+    busy = false;
+    renderMoves();
+  }
+
+  function stepBack() {
+    if (busy || step.idx === 0) return;
+    step.idx--;
+    view.set(setupMoves(cur).concat(step.list.slice(0, step.idx)));
+    renderMoves();
+  }
+
   async function playAlg() {
     const it = cur;
-    const fin = finishMove(it);
-    await playMoves(it.c.alg.split(' ').concat(fin ? [fin] : []), setupMoves(it));
-    setTimeout(() => { if (!busy && cur === it) view.set(setupMoves(it)); }, 1200);
+    step.idx = 0;
+    await playMoves(step.list, setupMoves(it), (i) => { step.idx = i; renderMoves(i); });
+    if (cur !== it) return;
+    step.idx = step.list.length;
+    renderMoves();
   }
 
   async function playSetup() { await playMoves(setupMoves(cur), []); }
@@ -373,6 +415,15 @@
     $('#f2lPrev').addEventListener('click', (e) => { e.currentTarget.blur(); prev(); });
     $('#f2lReveal').addEventListener('click', reveal);
     $('#f2lPlay').addEventListener('click', playAlg);
+    $('#f2lStep').addEventListener('click', stepForward);
+    $('#f2lStepBack').addEventListener('click', stepBack);
+    $('#trSpeed').value = String(speed());
+    $('#trSpeed').addEventListener('change', (e) => {
+      app.data.trainers = app.data.trainers || {};
+      app.data.trainers.speed = Number(e.target.value);
+      app.save();
+      e.target.blur();
+    });
     $('#f2lSetupPlay').addEventListener('click', playSetup);
     $('#f2lTimer').addEventListener('click', toggleTimer);
     $('#f2lPicker').addEventListener('click', onPicker);
